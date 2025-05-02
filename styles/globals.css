@@ -1,0 +1,34 @@
+/* Add these rules to your global styles */
+html,
+body {
+  height: 100%;
+  overflow: hidden; /* Prevent main page scrolling */
+  margin: 0;
+  padding: 0;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    Segoe UI,
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    Fira Sans,
+    Droid Sans,
+    Helvetica Neue,
+    sans-serif; /* Example font */
+  box-sizing: border-box;
+}
+
+#__next {
+  /* Next.js root div */
+  height: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+/* Other global styles */

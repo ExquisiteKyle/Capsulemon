@@ -1,0 +1,38 @@
+.background {
+  position: fixed; /* Fixes it to the viewport */
+  top: 0;
+  left: 0;
+  width: 100vw; /* Covers full viewport width */
+  height: 100vh; /* Covers full viewport height */
+  background: linear-gradient(
+    135deg,
+    #667eea 0%,
+    #764ba2 100%
+  ); /* Your gradient */
+  overflow: hidden; /* Important to prevent scrollbars from fixed elements */
+  z-index: -1; /* Ensures it stays behind all other content */
+}
+
+.background::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Your pattern background image */
+  background-image:
+    radial-gradient(
+      circle at 25px 25px,
+      rgba(255, 255, 255, 0.1) 2%,
+      transparent 0%
+    ),
+    radial-gradient(
+      circle at 75px 75px,
+      rgba(255, 255, 255, 0.1) 2%,
+      transparent 0%
+    );
+  background-size: 100px 100px;
+  opacity: 0.5;
+  z-index: -1; /* Ensure pseudo-element is also behind */
+}
