@@ -1,10 +1,13 @@
-require("dotenv").config({ path: "./.env.local" });
-const express = require("express");
-const sqlite3 = require("sqlite3").verbose();
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
-const { initializeDatabase } = require("./dbInitializer"); // Import the initializer
+import dotenv from "dotenv";
+dotenv.config({ path: "./.env.local" });
+import express from "express";
+import sqlite3 from "sqlite3";
+import cors from "cors";
+import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
+import { initializeDatabase } from "./dbInitializer.js"; // Added .js extension
+import { generateToken, doubleCsrfProtection } from "./middleware/csrf.js"; // Keep .js extension
+import createRoutes from "./routes/index.js"; // Default import for routes
 
 const app = express();
 const port = 3001;
@@ -20,6 +23,14 @@ app.use(
 app.use(bodyParser.json());
 app.use(cookieParser());
 
+// Apply CSRF protection middleware
+app.use(doubleCsrfProtection);
+
+// Add CSRF token endpoint
+app.get("/api/csrf-token", (req, res) => {
+  res.json({ csrfToken: generateToken(res) });
+});
+
 // Database setup
 const db = new sqlite3.Database("./database.sqlite", (err) => {
   if (err) {
@@ -32,8 +43,8 @@ const db = new sqlite3.Database("./database.sqlite", (err) => {
   }
 });
 
-// Import and use routes
-const routes = require("./routes/index")(db);
+// Use the imported routes
+const routes = createRoutes(db);
 app.use("/", routes);
 
 app.listen(port, () => {

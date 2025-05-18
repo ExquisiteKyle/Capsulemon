@@ -1,5 +1,5 @@
 // Function to create a new card
-const createCard = (db, cardData, callback) => {
+export const createCard = (db, cardData, callback) => {
   const { name, rarity, element_id, power, image_url } = cardData;
 
   // Basic validation (can also be done in route handler)
@@ -25,7 +25,7 @@ const createCard = (db, cardData, callback) => {
 };
 
 // Function to get cards owned by a specific user
-const getCards = (db, userId, callback) => {
+export const getCards = (db, userId, callback) => {
   db.all(
     `SELECT c.*, e.name as element_name 
      FROM cards c 
@@ -40,9 +40,4 @@ const getCards = (db, userId, callback) => {
       callback(null, cards);
     }
   );
-};
-
-module.exports = {
-  createCard,
-  getCards,
 };

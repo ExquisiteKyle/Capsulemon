@@ -1,6 +1,6 @@
-const bcrypt = require("bcrypt");
+import bcrypt from "bcrypt";
 
-const initializeDatabase = (db) => {
+export const initializeDatabase = (db) => {
   if (!db) {
     console.error("Database instance not provided to initializeDatabase");
     return;
@@ -44,7 +44,7 @@ const initializeDatabase = (db) => {
   });
 };
 
-const createDefaultUsers = (db) => {
+export const createDefaultUsers = (db) => {
   if (!db) {
     console.error("Database instance not provided to createDefaultUsers");
     return;
@@ -65,7 +65,7 @@ const createDefaultUsers = (db) => {
   );
 };
 
-const createDefaultElements = (db) => {
+export const createDefaultElements = (db) => {
   if (!db) {
     console.error("Database instance not provided to createDefaultElements");
     return;
@@ -81,8 +81,4 @@ const createDefaultElements = (db) => {
         console.error(`Error inserting element "${element}":`, err.message)
     )
   );
-};
-
-module.exports = {
-  initializeDatabase,
 };

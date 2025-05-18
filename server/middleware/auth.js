@@ -1,7 +1,7 @@
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 
 // Middleware factory function for authentication using JWT
-const authenticateUser = (db) => (req, res, next) => {
+export const authenticateUser = (db) => (req, res, next) => {
   const token = req.cookies.token;
 
   if (!token) {
@@ -42,14 +42,9 @@ const authenticateUser = (db) => (req, res, next) => {
 };
 
 // Middleware for requiring admin privileges (does not need db or bcrypt directly)
-const requireAdmin = (req, res, next) => {
+export const requireAdmin = (req, res, next) => {
   if (!req.user || !req.user.isAdmin) {
     return res.status(403).json({ message: "Admin privileges required" });
   }
   next();
-};
-
-module.exports = {
-  authenticateUser,
-  requireAdmin,
 };

@@ -1,12 +1,12 @@
-const express = require("express");
-const { authenticateUser, requireAdmin } = require("../middleware/auth"); // Import middleware
-const { getAllElements } = require("../services/elementService"); // Import element service
-const { createCard, getCards } = require("../services/cardService"); // Import card service
-const bcrypt = require("bcrypt"); // Import bcrypt
-const jwt = require("jsonwebtoken"); // Import jwt for token generation
+import express from "express";
+import { authenticateUser, requireAdmin } from "../middleware/auth.js"; // Import middleware
+import { getAllElements } from "../services/elementService.js"; // Import element service
+import { createCard, getCards } from "../services/cardService.js"; // Import card service
+import bcrypt from "bcrypt"; // Import bcrypt
+import jwt from "jsonwebtoken"; // Import jwt for token generation
 
-// Export a function that creates the router, taking the db instance
-module.exports = (db) => {
+// Export as default ES6 export
+export default (db) => {
   const router = express.Router();
   const jwtSecret = process.env.JWT_SECRET; // Get JWT secret from env
 

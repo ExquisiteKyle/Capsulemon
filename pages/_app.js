@@ -1,10 +1,14 @@
 import "../styles/globals.css"; // Import global styles
 import { AuthProvider } from "../context/AuthContext";
+import Navbar from "../components/Navbar";
 
 function MyApp({ Component, pageProps }) {
   return (
     <AuthProvider>
-      <Component {...pageProps} />
+      <Navbar />
+      <main className="mainContent">
+        <Component {...pageProps} />
+      </main>
     </AuthProvider>
   );
 }

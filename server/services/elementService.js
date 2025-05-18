@@ -1,6 +1,6 @@
 // Function to get all elements
-const getAllElements = (db, callback) => {
-  db.all("SELECT * FROM elements", (err, elements) => {
+export const getAllElements = (db, callback) => {
+  db.all("SELECT * FROM elements", (err, rows) => {
     // Use the provided callback to handle the result or error
     if (err) {
       console.error("Get elements DB error:", err);
@@ -8,10 +8,6 @@ const getAllElements = (db, callback) => {
       return callback(err);
     }
     // Pass results to callback
-    callback(null, elements);
+    callback(null, rows);
   });
-};
-
-module.exports = {
-  getAllElements,
 };

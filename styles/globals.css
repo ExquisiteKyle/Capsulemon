@@ -32,3 +32,7 @@ body {
 }
 
 /* Other global styles */
+.mainContent {
+  padding-top: 60px; /* Must match navbar height */
+  min-height: calc(100vh - 60px);
+}

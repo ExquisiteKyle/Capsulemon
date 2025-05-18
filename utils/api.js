@@ -7,6 +7,7 @@ const fetchWithAuth = async (endpoint, options = {}) => {
     credentials: "include", // Always include cookies for authentication
     headers: {
       "Content-Type": "application/json",
+      "X-CSRF-Token": await getCSRFToken(),
       ...options.headers,
     },
   });
@@ -41,3 +42,10 @@ export const createCard = async (cardData) =>
   });
 
 export const fetchCards = async () => fetchWithAuth("/cards");
+
+// Add helper function
+const getCSRFToken = async () => {
+  const response = await fetch(`${API_BASE_URL}/csrf-token`);
+  const { csrfToken } = await response.json();
+  return csrfToken;
+};
