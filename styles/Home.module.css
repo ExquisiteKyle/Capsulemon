@@ -180,3 +180,33 @@
     transform: scale(1);
   }
 }
+
+.testButtons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.testButton {
+  padding: 0.5rem 1rem;
+  background: #444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.testButton:hover {
+  background: #666;
+}
+
+.testResult {
+  margin-top: 1rem;
+  color: #4CAF50;
+}
+
+.testError {
+  margin-top: 1rem;
+  color: #f44336;
+}

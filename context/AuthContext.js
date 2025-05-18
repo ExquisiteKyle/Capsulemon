@@ -18,36 +18,31 @@ export const AuthProvider = ({ children }) => {
     setUsername(usernameValue);
   };
 
+  // Initial auth check - only runs once on mount
   useEffect(() => {
     const checkAuthStatus = async () => {
-      fetchUser()
-        .then(async (userResponse) => {
-          if (userResponse.ok) {
-            const userData = await userResponse.json();
-            // Use helper function for authenticated state
-            updateAuthState(true, userData.isAdmin, userData.username);
-          } else if (userResponse.status === 401) {
-            // Use helper function for unauthenticated state on 401
-            updateAuthState(false, false, null);
-          } else {
-            console.error(
-              "Error checking authentication status:",
-              userResponse.status
-            );
-            setError("An error occurred while checking login status.");
-            // Also set unauthenticated state on other errors
-            updateAuthState(false, false, null);
-          }
-        })
-        .catch((err) => {
-          console.error("Error during authentication check:", err);
-          setError("An error occurred during authentication check.");
-          // Use helper function for unauthenticated state on fetch error
+      try {
+        const userResponse = await fetchUser();
+
+        if (!userResponse.ok) {
+          // Clear auth state if not authenticated
           updateAuthState(false, false, null);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+          if (userResponse.status !== 401) {
+            // Only set error for non-401 responses
+            setError("An error occurred while checking login status.");
+          }
+          return;
+        }
+
+        const userData = await userResponse.json();
+        updateAuthState(true, userData.isAdmin, userData.username);
+      } catch (err) {
+        console.error("Error during authentication check:", err);
+        updateAuthState(false, false, null);
+        setError("An error occurred during authentication check.");
+      } finally {
+        setLoading(false);
+      }
     };
 
     checkAuthStatus();
@@ -55,54 +50,53 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     setError(null);
-    return loginUser(username, password)
-      .then(async (response) => {
-        if (!response.ok) {
-          const data = await response.json();
-          setError(data.message || "Login failed");
-          // Use helper function for unauthenticated state on non-ok response
-          updateAuthState(false, false, null);
-          return false;
-        }
+    try {
+      const response = await loginUser(username, password);
 
-        const data = await response.json();
-        // Use helper function for authenticated state on successful login
-        updateAuthState(true, data.user.isAdmin, data.user.username);
-        return true;
-      })
-      .catch((err) => {
-        console.error("Error during login:", err);
-        setError("An error occurred during login.");
-        // Use helper function for unauthenticated state on fetch error
+      if (!response.ok) {
+        const errorMsg =
+          response.error || response.data?.message || "Login failed";
+        setError(errorMsg);
         updateAuthState(false, false, null);
         return false;
-      });
+      }
+
+      updateAuthState(
+        true,
+        response.data.user.isAdmin,
+        response.data.user.username
+      );
+      return true;
+    } catch (err) {
+      console.error("Error during login:", err);
+      setError("An error occurred during login.");
+      updateAuthState(false, false, null);
+      return false;
+    }
   };
 
   const logout = async () => {
-    setError(null);
-    return logoutUser()
-      .then(async (response) => {
-        if (!response.ok) {
-          console.error("Logout failed", response.status);
-          setError("Logout failed.");
-          // Use helper function for unauthenticated state on non-ok response
-          updateAuthState(false, false, null);
-          return false;
-        }
+    if (!isLoggedIn) return true; // Don't attempt logout if not logged in
 
-        // Use helper function for unauthenticated state on successful logout
-        updateAuthState(false, false, null);
-        console.log("Logged out successfully");
-        return true;
-      })
-      .catch((err) => {
-        console.error("Error during logout:", err);
-        setError("An error occurred during logout.");
-        // Use helper function for unauthenticated state on fetch error
-        updateAuthState(false, false, null);
+    setError(null);
+    try {
+      const response = await logoutUser();
+
+      if (!response.ok) {
+        console.error("Logout failed", response.status);
+        setError("Logout failed.");
         return false;
-      });
+      }
+
+      updateAuthState(false, false, null);
+      console.log("Logged out successfully");
+      return true;
+    } catch (err) {
+      console.error("Error during logout:", err);
+      setError("An error occurred during logout.");
+      updateAuthState(false, false, null);
+      return false;
+    }
   };
 
   return (

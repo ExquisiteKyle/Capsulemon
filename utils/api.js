@@ -1,51 +1,92 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
+// Get CSRF token using Double Submit Cookie Pattern
+const getCSRFToken = () =>
+  fetch(`${API_BASE_URL}/auth/csrf-token`, {
+    credentials: "include", // Important: include cookies
+  })
+    .then((response) => {
+      if (!response.ok) {
+        // If unauthorized, don't throw error - just return null
+        if (response.status === 401) {
+          return null;
+        }
+        throw new Error("Failed to fetch CSRF token");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      if (!data) return null;
+      if (!data.csrfToken) {
+        throw new Error("Invalid CSRF token received");
+      }
+      return data.csrfToken;
+    })
+    .catch((error) => {
+      console.error("Error getting CSRF token:", error);
+      throw error;
+    });
+
 // Generic function to make authenticated API calls
-const fetchWithAuth = async (endpoint, options = {}) => {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    credentials: "include", // Always include cookies for authentication
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRF-Token": await getCSRFToken(),
-      ...options.headers,
-    },
-  });
+const fetchWithAuth = (endpoint, options = {}) =>
+  getCSRFToken()
+    .then((token) => {
+      const headers = {
+        "Content-Type": "application/json",
+        ...options.headers,
+      };
 
-  // You can add common error handling here if needed, e.g., checking for 500 status
-  // For now, we'll let the calling code handle specific statuses like 401/403
+      // Only add CSRF token if we have one (user is authenticated)
+      if (token) {
+        headers["X-CSRF-Token"] = token;
+      }
 
-  return response;
-};
+      return fetch(`${API_BASE_URL}${endpoint}`, {
+        ...options,
+        credentials: "include", // Always include cookies for authentication
+        headers,
+      });
+    })
+    .catch((error) => {
+      console.error("Error in fetchWithAuth:", error);
+      throw error;
+    });
 
 // Specific API call functions
+export const fetchUser = () => fetchWithAuth("/user");
 
-export const fetchUser = async () => fetchWithAuth("/user");
+export const fetchElements = () => fetchWithAuth("/elements");
 
-export const fetchElements = async () => fetchWithAuth("/elements");
-
-export const loginUser = async (username, password) =>
-  fetchWithAuth("/login", {
-    method: "POST",
-    body: JSON.stringify({ username, password }),
-  });
-
-export const logoutUser = async () =>
+export const logoutUser = () =>
   fetchWithAuth("/logout", {
     method: "POST",
   });
 
-export const createCard = async (cardData) =>
+export const createCard = (cardData) =>
   fetchWithAuth("/add-cards", {
     method: "POST",
     body: JSON.stringify(cardData),
   });
 
-export const fetchCards = async () => fetchWithAuth("/cards");
+export const fetchCards = () => fetchWithAuth("/cards");
 
-// Add helper function
-const getCSRFToken = async () => {
-  const response = await fetch(`${API_BASE_URL}/csrf-token`);
-  const { csrfToken } = await response.json();
-  return csrfToken;
-};
+// Login should NOT use fetchWithAuth since it needs to establish the session first
+export const loginUser = (username, password) =>
+  fetch(`${API_BASE_URL}/auth/login`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username, password }),
+  })
+    .then(async (response) => ({
+      ok: response.ok,
+      data: await response.json(),
+      status: response.status,
+    }))
+    .catch(() => ({
+      ok: false,
+      error: "Network or server error",
+      status: 500,
+    }));

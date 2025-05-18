@@ -1,50 +1,57 @@
 import jwt from "jsonwebtoken";
 
-// Middleware factory function for authentication using JWT
-export const authenticateUser = (db) => (req, res, next) => {
-  const token = req.cookies.token;
+const verifyToken = (token, secret) =>
+  new Promise((resolve, reject) => {
+    jwt.verify(token, secret, (err, decoded) => {
+      if (err) reject(err);
+      else resolve(decoded);
+    });
+  });
 
-  if (!token) {
-    return res.status(401).json({ message: "Authentication required" });
-  }
-
-  const jwtSecret = process.env.JWT_SECRET;
-
-  jwt.verify(token, jwtSecret, (err, decodedToken) => {
-    if (err) {
-      console.error("JWT verification error:", err);
-      res.clearCookie("token");
-      return res.status(401).json({ message: "Invalid or expired token" });
-    }
-
+const getUser = (db, userId) =>
+  new Promise((resolve, reject) => {
     db.get(
-      "SELECT * FROM users WHERE id = ?",
-      [decodedToken.id],
+      "SELECT id, username, isAdmin FROM users WHERE id = ?",
+      [userId],
       (err, user) => {
-        if (err) {
-          console.error("Authentication DB error:", err);
-          res.clearCookie("token");
-          return res
-            .status(500)
-            .json({ message: "Database error during authentication" });
-        }
-
-        if (!user) {
-          res.clearCookie("token");
-          return res.status(401).json({ message: "User not found" });
-        }
-
-        req.user = user;
-        next();
+        if (err) reject(err);
+        else resolve(user);
       }
     );
   });
+
+// Initialize auth middleware with db instance
+const initializeAuth = (db) => {
+  const authenticateUser = (req, res, next) => {
+    const token = req.cookies.token;
+
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" });
+    }
+
+    verifyToken(token, process.env.JWT_SECRET)
+      .then((decoded) => getUser(db, decoded.id))
+      .then((user) => {
+        if (!user) {
+          return res.status(401).json({ message: "User not found" });
+        }
+        req.user = user;
+        next();
+      })
+      .catch((err) => {
+        console.error("Authentication error:", err);
+        return res.status(401).json({ message: "Invalid token" });
+      });
+  };
+
+  const requireAdmin = (req, res, next) => {
+    if (!req.user?.isAdmin) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+    next();
+  };
+
+  return { authenticateUser, requireAdmin };
 };
 
-// Middleware for requiring admin privileges (does not need db or bcrypt directly)
-export const requireAdmin = (req, res, next) => {
-  if (!req.user || !req.user.isAdmin) {
-    return res.status(403).json({ message: "Admin privileges required" });
-  }
-  next();
-};
+export { initializeAuth };

@@ -1,26 +1,16 @@
 import express from "express";
-import { authenticateUser, requireAdmin } from "../middleware/auth.js"; // Import middleware
-import { getAllElements } from "../services/elementService.js"; // Import element service
-import { createCard, getCards } from "../services/cardService.js"; // Import card service
-import bcrypt from "bcrypt"; // Import bcrypt
-import jwt from "jsonwebtoken"; // Import jwt for token generation
+import { getAllElements } from "../services/elementService.js";
+import { createCard, getCards } from "../services/cardService.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
-// Export as default ES6 export
-export default (db) => {
-  const router = express.Router();
-  const jwtSecret = process.env.JWT_SECRET; // Get JWT secret from env
-
-  // Instantiate middleware with the db instance
-  const authMiddleware = authenticateUser(db);
-
-  // Login endpoint (still handles DB interaction directly as it's tied to login process)
-  router.post("/login", (req, res) => {
-    const { username, password } = req.body;
-
+const handleLogin = (db, username, password) =>
+  new Promise((resolve, reject) => {
     if (!username || !password) {
-      return res
-        .status(400)
-        .json({ message: "Username and password are required" });
+      return reject({
+        status: 400,
+        message: "Username and password are required",
+      });
     }
 
     db.get(
@@ -29,107 +19,160 @@ export default (db) => {
       (err, user) => {
         if (err) {
           console.error("Login DB error:", err);
-          return res
-            .status(500)
-            .json({ message: "Database error during login" });
+          return reject({
+            status: 500,
+            message: "Database error during login",
+          });
         }
 
         if (!user) {
-          return res.status(401).json({ message: "Invalid credentials" });
+          return reject({ status: 401, message: "Invalid credentials" });
         }
 
         bcrypt.compare(password, user.password, (err, result) => {
-          // bcrypt is needed here
           if (err) {
             console.error("Login bcrypt compare error:", err);
-            return res.status(500).json({ message: "Authentication error" });
+            return reject({ status: 500, message: "Authentication error" });
           }
 
           if (!result) {
-            return res.status(401).json({ message: "Invalid credentials" });
+            return reject({ status: 401, message: "Invalid credentials" });
           }
 
-          // Generate JWT token
-          const token = jwt.sign(
-            { id: user.id, isAdmin: user.isAdmin },
-            jwtSecret,
-            { expiresIn: "1h" }
-          );
-
-          // Set token in cookie
-          res.cookie("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-          });
-
-          res.json({
-            message: "Login successful",
-            user: {
-              username: user.username,
-              isAdmin: user.isAdmin,
-            },
-          });
+          resolve(user);
         });
       }
     );
   });
 
-  // Logout endpoint
-  router.post("/logout", authMiddleware, (req, res) => {
-    res.clearCookie("token");
-    res.json({ message: "Logged out successfully" });
+const generateAuthToken = (user) =>
+  jwt.sign({ id: user.id, isAdmin: user.isAdmin }, process.env.JWT_SECRET, {
+    expiresIn: "1h",
   });
 
-  // GET authenticated user details endpoint (requires authentication middleware)
-  router.get("/user", authMiddleware, (req, res) =>
+export default (
+  db,
+  {
+    authenticateUser,
+    requireAdmin,
+    generateCsrfToken,
+    csrfMiddleware,
+    validateExistingToken,
+  }
+) => {
+  const router = express.Router();
+
+  // Public routes (no auth or CSRF needed)
+  router.post("/auth/login", (req, res) => {
+    const { username, password } = req.body;
+
+    handleLogin(db, username, password)
+      .then((user) => {
+        const jwtToken = generateAuthToken(user);
+
+        res.cookie("token", jwtToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          path: "/",
+        });
+
+        return generateCsrfToken(res).then(() => ({
+          message: "Login successful",
+          user: {
+            username: user.username,
+            isAdmin: user.isAdmin,
+          },
+        }));
+      })
+      .then((response) => res.json(response))
+      .catch((error) => {
+        const status = error.status || 500;
+        const message = error.message || "Login failed";
+        res.status(status).json({ message });
+      });
+  });
+
+  // Authentication check middleware for all routes below
+  router.use(authenticateUser);
+
+  // Get user info
+  router.get("/user", (req, res) =>
     res.json({
       username: req.user.username,
       isAdmin: req.user.isAdmin,
     })
   );
 
-  // Get all elements (requires authentication middleware)
-  router.get("/elements", authMiddleware, (req, res) =>
-    getAllElements(db, (err, elements) => {
-      if (err) return res.status(500).json({ message: "Database error" });
-      res.json(elements);
-    })
+  // CSRF token endpoint (requires auth)
+  router.get("/auth/csrf-token", (req, res) =>
+    validateExistingToken(req)
+      .then((token) => res.json({ csrfToken: token }))
+      .catch(() =>
+        generateCsrfToken(res).then((token) => {
+          console.log("Generated new CSRF token");
+          return res.json({ csrfToken: token });
+        })
+      )
+      .catch((error) => {
+        console.error("Error handling CSRF token:", error);
+        res.status(500).json({ message: "Failed to handle CSRF token" });
+      })
   );
 
-  // Add new card (requires authentication and admin middleware)
-  router.post("/add-cards", authMiddleware, requireAdmin, (req, res) =>
-    createCard(db, req.body, (err, result) => {
-      if (err) {
-        // Check for the specific "missing fields" error from service or generic DB error
+  // Apply CSRF protection for all routes below
+  router.use(csrfMiddleware);
+
+  // Protected routes (require both auth and CSRF)
+  router.post("/logout", (req, res) => {
+    res.clearCookie("token");
+    res.clearCookie("x-csrf-token", {
+      path: "/",
+      secure: process.env.NODE_ENV === "production",
+    });
+    res.json({ message: "Logged out successfully" });
+  });
+
+  router.get("/elements", (req, res) =>
+    getAllElements(db)
+      .then((elements) => res.json(elements))
+      .catch((err) => {
+        console.error("Error fetching elements:", err);
+        res.status(500).json({ message: "Database error" });
+      })
+  );
+
+  router.post("/add-cards", requireAdmin, (req, res) =>
+    createCard(db, req.body)
+      .then((result) =>
+        res.json({
+          message: "Card created successfully",
+          id: result.id,
+        })
+      )
+      .catch((err) => {
         if (err.message === "Missing required card fields") {
           return res.status(400).json({ message: err.message });
         }
-        // Handle other errors
+        console.error("Error creating card:", err);
         return res.status(500).json({ message: "Database error" });
-      }
-      // Success response
-      res.json({
-        message: "Card created successfully",
-        id: result.id,
-      });
-    })
+      })
   );
 
-  // Get cards (requires authentication)
-  router.get("/cards", authMiddleware, (req, res) => {
+  router.get("/cards", (req, res) => {
     console.log("GET /cards endpoint called");
     console.log("User:", req.user);
-    // Pass the authenticated user's ID to getCards
-    getCards(db, req.user.id, (err, cards) => {
-      if (err) {
+
+    getCards(db, req.user.id)
+      .then((cards) => {
+        console.log("Cards found:", cards.length);
+        res.json(cards);
+      })
+      .catch((err) => {
         console.error("Error fetching cards:", err);
-        return res.status(500).json({ message: "Database error" });
-      }
-      console.log("Cards found:", cards.length);
-      return res.json(cards);
-    });
+        res.status(500).json({ message: "Database error" });
+      });
   });
 
-  return router; // Return the router
+  return router;
 };

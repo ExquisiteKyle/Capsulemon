@@ -76,6 +76,7 @@ const Home = () => {
           </div>
           {/* Use error from AuthContext */}
           {error && <p className={styles.error}>{error}</p>}
+
           <button type="submit" className={styles.submitButton}>
             Login
           </button>

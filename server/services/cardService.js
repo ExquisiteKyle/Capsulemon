@@ -1,43 +1,44 @@
 // Function to create a new card
-export const createCard = (db, cardData, callback) => {
+export const createCard = (db, cardData) => {
   const { name, rarity, element_id, power, image_url } = cardData;
 
-  // Basic validation (can also be done in route handler)
+  // Basic validation
   if (!name || !rarity || !element_id || !power) {
-    // Use callback to indicate missing fields (as a form of error)
-    return callback(new Error("Missing required card fields"));
+    return Promise.reject(new Error("Missing required card fields"));
   }
 
-  db.run(
-    "INSERT INTO cards (name, rarity, element_id, power, image_url) VALUES (?, ?, ?, ?, ?)",
-    [name, rarity, element_id, power, image_url],
-    function (err) {
-      // Use 'function' to access 'this.lastID'
-      if (err) {
-        console.error("Add card DB error:", err);
-        // Pass error to callback
-        return callback(err);
+  return new Promise((resolve, reject) => {
+    db.run(
+      "INSERT INTO cards (name, rarity, element_id, power, image_url) VALUES (?, ?, ?, ?, ?)",
+      [name, rarity, element_id, power, image_url],
+      function (err) {
+        if (err) {
+          console.error("Add card DB error:", err);
+          reject(err);
+          return;
+        }
+        resolve({ id: this.lastID });
       }
-      // Pass success with the new ID to callback
-      callback(null, { id: this.lastID });
-    }
-  );
+    );
+  });
 };
 
 // Function to get cards owned by a specific user
-export const getCards = (db, userId, callback) => {
-  db.all(
-    `SELECT c.*, e.name as element_name 
-     FROM cards c 
-     JOIN elements e ON c.element_id = e.id
-     JOIN cards uc ON c.id = uc.id
-     WHERE uc.id = ?`,
-    [userId],
-    (err, cards) => {
-      if (err) {
-        return callback(err);
+export const getCards = (db, userId) =>
+  new Promise((resolve, reject) => {
+    db.all(
+      `SELECT c.*, e.name as element_name 
+       FROM cards c 
+       JOIN elements e ON c.element_id = e.id
+       JOIN cards uc ON c.id = uc.id
+       WHERE uc.id = ?`,
+      [userId],
+      (err, cards) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve(cards);
       }
-      callback(null, cards);
-    }
-  );
-};
+    );
+  });
