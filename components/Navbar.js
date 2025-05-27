@@ -11,6 +11,7 @@ const Navbar = () => {
   const { isLoggedIn, isAdmin, logout } = useAuth();
 
   const handleCreateCard = () => router.push("/create-card");
+  const handleManageCards = () => router.push("/admin/manage-cards");
 
   const handleBack = () => {
     // Use early return for the negative case: not logged in
@@ -37,10 +38,19 @@ const Navbar = () => {
   // Rely directly on isLoggedIn and isAdmin states from context
   const showCreateCardButton = isLoggedIn && isAdmin;
 
+  // Determine if the Manage Cards button should be visible
+  // Rely directly on isLoggedIn and isAdmin states from context
+  const showManageCardsButton = isLoggedIn && isAdmin;
+
   // Return an empty div if no buttons should be shown (e.g., on login page loading)
   // The AuthContext loading state could also be used here if needed,
   // but for a simple Navbar, just hiding buttons is often sufficient.
-  if (!showBackButton && !showLogoutButton && !showCreateCardButton) {
+  if (
+    !showBackButton &&
+    !showLogoutButton &&
+    !showCreateCardButton &&
+    !showManageCardsButton
+  ) {
     // Optionally, return null or loading indicator based on AuthContext loading
     // const { loading } = useAuth();
     // if (loading) return null; // or a loading spinner
@@ -57,6 +67,11 @@ const Navbar = () => {
       {/* Adding a flexible space or title */}
       <div className={styles.spacer} />
 
+      {showManageCardsButton && (
+        <button onClick={handleManageCards} className={styles.manageButton}>
+          Manage Cards
+        </button>
+      )}
       {showCreateCardButton && (
         <button onClick={handleCreateCard} className={styles.createButton}>
           Create New Card

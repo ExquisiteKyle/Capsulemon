@@ -3,6 +3,7 @@ import { getAllElements } from "../services/elementService.js";
 import { createCard, getCards } from "../services/cardService.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import createCardRoutes from "./cards.js";
 
 const handleLogin = (db, username, password) =>
   new Promise((resolve, reject) => {
@@ -142,37 +143,17 @@ export default (
       })
   );
 
-  router.post("/add-cards", requireAdmin, (req, res) =>
-    createCard(db, req.body)
-      .then((result) =>
-        res.json({
-          message: "Card created successfully",
-          id: result.id,
-        })
-      )
-      .catch((err) => {
-        if (err.message === "Missing required card fields") {
-          return res.status(400).json({ message: err.message });
-        }
-        console.error("Error creating card:", err);
-        return res.status(500).json({ message: "Database error" });
-      })
+  // Mount card routes (includes both card management and ownership)
+  router.use(
+    "/cards",
+    createCardRoutes(db, {
+      authenticateUser,
+      requireAdmin,
+      generateCsrfToken,
+      csrfMiddleware,
+      validateExistingToken,
+    })
   );
-
-  router.get("/cards", (req, res) => {
-    console.log("GET /cards endpoint called");
-    console.log("User:", req.user);
-
-    getCards(db, req.user.id)
-      .then((cards) => {
-        console.log("Cards found:", cards.length);
-        res.json(cards);
-      })
-      .catch((err) => {
-        console.error("Error fetching cards:", err);
-        res.status(500).json({ message: "Database error" });
-      });
-  });
 
   return router;
 };

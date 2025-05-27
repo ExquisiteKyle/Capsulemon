@@ -31,7 +31,7 @@ const setupDatabase = () =>
 const startServer = async () => {
   try {
     const db = await setupDatabase();
-    await initializeDatabase(db);
+    // await initializeDatabase(db);
 
     const app = express();
     const port = process.env.PORT || 3001;

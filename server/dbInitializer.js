@@ -46,6 +46,7 @@ export const initializeDatabase = (db) => {
       runQuery(db, "DROP TABLE IF EXISTS users"),
       runQuery(db, "DROP TABLE IF EXISTS cards"),
       runQuery(db, "DROP TABLE IF EXISTS elements"),
+      runQuery(db, "DROP TABLE IF EXISTS owned_cards"),
     ]);
 
   const createTables = () =>
@@ -81,6 +82,20 @@ export const initializeDatabase = (db) => {
           power INTEGER NOT NULL,
           image_url TEXT,
           FOREIGN KEY (element_id) REFERENCES elements(id)
+        )
+      `
+      ),
+      runQuery(
+        db,
+        `
+        CREATE TABLE owned_cards (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id INTEGER NOT NULL,
+          card_id INTEGER NOT NULL,
+          quantity INTEGER NOT NULL DEFAULT 1,
+          acquired_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+          FOREIGN KEY (card_id) REFERENCES cards(id) ON DELETE CASCADE
         )
       `
       ),

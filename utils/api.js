@@ -63,12 +63,25 @@ export const logoutUser = () =>
   });
 
 export const createCard = (cardData) =>
-  fetchWithAuth("/add-cards", {
+  fetchWithAuth("/cards", {
     method: "POST",
     body: JSON.stringify(cardData),
   });
 
 export const fetchCards = () => fetchWithAuth("/cards");
+
+export const fetchAllCards = () => fetchWithAuth("/cards/all");
+
+export const updateCard = (cardId, cardData) =>
+  fetchWithAuth(`/cards/${cardId}`, {
+    method: "PUT",
+    body: JSON.stringify(cardData),
+  });
+
+export const deleteCard = (cardId) =>
+  fetchWithAuth(`/cards/${cardId}`, {
+    method: "DELETE",
+  });
 
 // Login should NOT use fetchWithAuth since it needs to establish the session first
 export const loginUser = (username, password) =>

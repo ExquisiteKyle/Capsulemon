@@ -21,7 +21,8 @@
 
 .backButton,
 .createButton,
-.logoutButton {
+.logoutButton,
+.manageButton {
   padding: 0.6em 1.2em;
   border: none;
   border-radius: 5px;
@@ -51,6 +52,16 @@
 
 .createButton:hover {
   background-color: #218838;
+  transform: translateY(-1px);
+}
+
+.manageButton {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.manageButton:hover {
+  background-color: #138496;
   transform: translateY(-1px);
 }
 
