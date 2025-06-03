@@ -103,3 +103,45 @@ export const loginUser = (username, password) =>
       error: "Network or server error",
       status: 500,
     }));
+
+// Pack-related API calls
+export const fetchPacks = () => fetchWithAuth("/packs");
+
+export const fetchPackById = (packId) => fetchWithAuth(`/packs/${packId}`);
+
+export const createPack = (packData) =>
+  fetchWithAuth("/packs", {
+    method: "POST",
+    body: JSON.stringify(packData),
+  });
+
+export const updatePack = (packId, packData) =>
+  fetchWithAuth(`/packs/${packId}`, {
+    method: "PUT",
+    body: JSON.stringify(packData),
+  });
+
+export const deletePack = (packId) =>
+  fetchWithAuth(`/packs/${packId}`, {
+    method: "DELETE",
+  });
+
+export const fetchPackCards = (packId) =>
+  fetchWithAuth(`/packs/${packId}/cards`);
+
+export const addCardToPack = (packId, cardId, dropRate) =>
+  fetchWithAuth(`/packs/${packId}/cards/${cardId}`, {
+    method: "POST",
+    body: JSON.stringify({ dropRate }),
+  });
+
+export const updateCardInPack = (packId, cardId, dropRate) =>
+  fetchWithAuth(`/packs/${packId}/cards/${cardId}`, {
+    method: "PUT",
+    body: JSON.stringify({ dropRate }),
+  });
+
+export const removeCardFromPack = (packId, cardId) =>
+  fetchWithAuth(`/packs/${packId}/cards/${cardId}`, {
+    method: "DELETE",
+  });

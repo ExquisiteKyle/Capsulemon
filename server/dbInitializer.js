@@ -47,6 +47,8 @@ export const initializeDatabase = (db) => {
       runQuery(db, "DROP TABLE IF EXISTS cards"),
       runQuery(db, "DROP TABLE IF EXISTS elements"),
       runQuery(db, "DROP TABLE IF EXISTS owned_cards"),
+      runQuery(db, "DROP TABLE IF EXISTS packs"),
+      runQuery(db, "DROP TABLE IF EXISTS pack_combination"),
     ]);
 
   const createTables = () =>
@@ -96,6 +98,31 @@ export const initializeDatabase = (db) => {
           acquired_date DATETIME DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
           FOREIGN KEY (card_id) REFERENCES cards(id) ON DELETE CASCADE
+        )
+      `
+      ),
+      runQuery(
+        db,
+        `
+        CREATE TABLE packs (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT UNIQUE NOT NULL,
+          cost INTEGER NOT NULL,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+      `
+      ),
+      runQuery(
+        db,
+        `
+        CREATE TABLE pack_combination (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          pack_id INTEGER NOT NULL,
+          card_id INTEGER NOT NULL,
+          drop_rate DECIMAL(5,2) NOT NULL,
+          FOREIGN KEY (pack_id) REFERENCES packs(id) ON DELETE CASCADE,
+          FOREIGN KEY (card_id) REFERENCES cards(id) ON DELETE CASCADE,
+          UNIQUE(pack_id, card_id)
         )
       `
       ),

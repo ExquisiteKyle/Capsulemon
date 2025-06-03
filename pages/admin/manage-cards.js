@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import styles from "../../styles/ManageCards.module.css";
 import Navbar from "../../components/Navbar";
+import Modal from "../../components/Modal";
 import { useAuth } from "../../context/AuthContext";
 import {
   fetchAllCards,
   fetchElements,
   updateCard,
   deleteCard,
+  createCard,
 } from "../../utils/api";
 
 const ManageCards = () => {
@@ -18,6 +20,16 @@ const ManageCards = () => {
   const [editingCard, setEditingCard] = useState(null);
   const [editFormData, setEditFormData] = useState(null);
   const [deletingCard, setDeletingCard] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedCard, setSelectedCard] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createFormData, setCreateFormData] = useState({
+    name: "",
+    rarity: "common",
+    element_id: "",
+    power: "",
+    image_url: "",
+  });
   const router = useRouter();
   const { isLoggedIn, isAdmin, loading: authLoading } = useAuth();
 
@@ -117,26 +129,70 @@ const ManageCards = () => {
   };
 
   const handleDelete = async (card) => {
-    if (!window.confirm(`Are you sure you want to delete ${card.name}?`)) {
-      return;
-    }
+    setSelectedCard(card);
+    setShowDeleteModal(true);
+  };
 
-    setDeletingCard(card.id);
+  const handleConfirmDelete = async () => {
+    if (!selectedCard) return;
+
+    setDeletingCard(selectedCard.id);
     try {
-      const response = await deleteCard(card.id);
+      const response = await deleteCard(selectedCard.id);
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.error || "Failed to delete card");
       }
 
       // Remove the card from the list
-      setCards(cards.filter((c) => c.id !== card.id));
+      setCards(cards.filter((c) => c.id !== selectedCard.id));
     } catch (err) {
       console.error("Error deleting card:", err);
-      alert(err.message);
+      setError(err.message);
     } finally {
       setDeletingCard(null);
+      setShowDeleteModal(false);
+      setSelectedCard(null);
     }
+  };
+
+  const handleCreateSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await createCard(createFormData);
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Failed to create card");
+      }
+
+      const newCard = await response.json();
+      // Add the new card to the list with element name
+      const elementName = elements.find(
+        (e) => e.id === parseInt(createFormData.element_id)
+      ).name;
+      setCards([{ ...newCard.card, element_name: elementName }, ...cards]);
+
+      // Reset form and close modal
+      setCreateFormData({
+        name: "",
+        rarity: "common",
+        element_id: "",
+        power: "",
+        image_url: "",
+      });
+      setShowCreateModal(false);
+    } catch (err) {
+      console.error("Error creating card:", err);
+      setError(err.message);
+    }
+  };
+
+  const handleCreateInputChange = (e) => {
+    const { name, value } = e.target;
+    setCreateFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   if (authLoading || loading) {
@@ -164,7 +220,7 @@ const ManageCards = () => {
         <div className={styles.actions}>
           <button
             className={styles.createButton}
-            onClick={() => router.push("/create-card")}
+            onClick={() => setShowCreateModal(true)}
           >
             Create New Card
           </button>
@@ -287,6 +343,118 @@ const ManageCards = () => {
           ))}
         </div>
       </div>
+
+      {/* Create Card Modal */}
+      <Modal
+        isOpen={showCreateModal}
+        onClose={() => {
+          setShowCreateModal(false);
+          setCreateFormData({
+            name: "",
+            rarity: "common",
+            element_id: "",
+            power: "",
+            image_url: "",
+          });
+        }}
+        title="Create New Card"
+        showActions={false}
+      >
+        <form onSubmit={handleCreateSubmit} className={styles.form}>
+          <div className={styles.formGroup}>
+            <label>Name:</label>
+            <input
+              type="text"
+              name="name"
+              value={createFormData.name}
+              onChange={handleCreateInputChange}
+              required
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label>Rarity:</label>
+            <select
+              name="rarity"
+              value={createFormData.rarity}
+              onChange={handleCreateInputChange}
+              required
+            >
+              <option value="common">Common</option>
+              <option value="rare">Rare</option>
+              <option value="epic">Epic</option>
+              <option value="legendary">Legendary</option>
+            </select>
+          </div>
+          <div className={styles.formGroup}>
+            <label>Element:</label>
+            <select
+              name="element_id"
+              value={createFormData.element_id}
+              onChange={handleCreateInputChange}
+              required
+            >
+              <option value="">Select an element</option>
+              {elements.map((element) => (
+                <option key={element.id} value={element.id}>
+                  {element.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className={styles.formGroup}>
+            <label>Power:</label>
+            <input
+              type="number"
+              name="power"
+              value={createFormData.power}
+              onChange={handleCreateInputChange}
+              required
+              min="1"
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label>Image URL (optional):</label>
+            <input
+              type="url"
+              name="image_url"
+              value={createFormData.image_url}
+              onChange={handleCreateInputChange}
+            />
+          </div>
+          <div className={styles.modalActions}>
+            <button
+              type="button"
+              className={styles.cancelButton}
+              onClick={() => {
+                setShowCreateModal(false);
+                setCreateFormData({
+                  name: "",
+                  rarity: "common",
+                  element_id: "",
+                  power: "",
+                  image_url: "",
+                });
+              }}
+            >
+              Cancel
+            </button>
+            <button type="submit" className={styles.saveButton}>
+              Create Card
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Card"
+        message={`Are you sure you want to delete ${selectedCard?.name}? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
     </div>
   );
 };

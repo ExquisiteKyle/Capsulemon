@@ -20,7 +20,7 @@ export default (db, { authenticateUser, requireAdmin }) => {
     try {
       const cards = await new Promise((resolve, reject) => {
         db.all(
-          `SELECT c.*, e.name as element_name 
+          `SELECT c.id, c.name, c.rarity, c.power, c.image_url, e.name as element_name 
            FROM cards c 
            JOIN elements e ON c.element_id = e.id
            ORDER BY c.name ASC`,

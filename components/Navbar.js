@@ -10,8 +10,8 @@ const Navbar = () => {
   // Get authentication state and logout function from AuthContext
   const { isLoggedIn, isAdmin, logout } = useAuth();
 
-  const handleCreateCard = () => router.push("/create-card");
   const handleManageCards = () => router.push("/admin/manage-cards");
+  const handleManagePacks = () => router.push("/admin/manage-packs");
 
   const handleBack = () => {
     // Use early return for the negative case: not logged in
@@ -34,13 +34,13 @@ const Navbar = () => {
   // Rely directly on the isLoggedIn state from context
   const showLogoutButton = isLoggedIn;
 
-  // Determine if the Create Card button should be visible
-  // Rely directly on isLoggedIn and isAdmin states from context
-  const showCreateCardButton = isLoggedIn && isAdmin;
-
   // Determine if the Manage Cards button should be visible
   // Rely directly on isLoggedIn and isAdmin states from context
   const showManageCardsButton = isLoggedIn && isAdmin;
+
+  // Determine if the Manage Packs button should be visible
+  // Rely directly on isLoggedIn and isAdmin states from context
+  const showManagePacksButton = isLoggedIn && isAdmin;
 
   // Return an empty div if no buttons should be shown (e.g., on login page loading)
   // The AuthContext loading state could also be used here if needed,
@@ -48,12 +48,9 @@ const Navbar = () => {
   if (
     !showBackButton &&
     !showLogoutButton &&
-    !showCreateCardButton &&
-    !showManageCardsButton
+    !showManageCardsButton &&
+    !showManagePacksButton
   ) {
-    // Optionally, return null or loading indicator based on AuthContext loading
-    // const { loading } = useAuth();
-    // if (loading) return null; // or a loading spinner
     return <div />;
   }
 
@@ -67,14 +64,14 @@ const Navbar = () => {
       {/* Adding a flexible space or title */}
       <div className={styles.spacer} />
 
+      {showManagePacksButton && (
+        <button onClick={handleManagePacks} className={styles.manageButton}>
+          Manage Packs
+        </button>
+      )}
       {showManageCardsButton && (
         <button onClick={handleManageCards} className={styles.manageButton}>
           Manage Cards
-        </button>
-      )}
-      {showCreateCardButton && (
-        <button onClick={handleCreateCard} className={styles.createButton}>
-          Create New Card
         </button>
       )}
       {/* Only show logout if isLoggedIn state from context is true */}

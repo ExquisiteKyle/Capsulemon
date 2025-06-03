@@ -4,6 +4,7 @@ import { createCard, getCards } from "../services/cardService.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import createCardRoutes from "./cards.js";
+import createPackRoutes from "./packs.js";
 
 const handleLogin = (db, username, password) =>
   new Promise((resolve, reject) => {
@@ -147,6 +148,18 @@ export default (
   router.use(
     "/cards",
     createCardRoutes(db, {
+      authenticateUser,
+      requireAdmin,
+      generateCsrfToken,
+      csrfMiddleware,
+      validateExistingToken,
+    })
+  );
+
+  // Mount pack routes
+  router.use(
+    "/packs",
+    createPackRoutes(db, {
       authenticateUser,
       requireAdmin,
       generateCsrfToken,

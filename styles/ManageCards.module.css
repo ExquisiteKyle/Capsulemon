@@ -162,6 +162,11 @@
   margin-top: 1rem;
 }
 
+.cardActions {
+  display: flex;
+  gap: 8px;
+}
+
 .editButton,
 .deleteButton {
   flex: 1;
