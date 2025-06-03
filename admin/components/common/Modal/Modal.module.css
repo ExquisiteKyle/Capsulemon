@@ -1,0 +1,107 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(4px);
+  z-index: 999;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg-secondary);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  min-width: 300px;
+  max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.dialog {
+  border-radius: 16px;
+  background: var(--bg-secondary);
+}
+
+.dialog:global(.MuiDialog-root.MuiModal-root) {
+  background-color: rgba(var(--shadow-color-rgb), 0.15);
+  backdrop-filter: blur(4px);
+}
+
+.dialog :global(.MuiDialogActions-root) {
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  padding: 1.5rem 1.5rem 0.5rem;
+}
+
+.content {
+  padding: 1.5rem;
+}
+
+.content :global(.formGroup) label {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.message {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.cancelButton {
+  background-color: var(--pastel-danger) !important;
+  color: var(--text-primary) !important;
+}
+
+.confirmButton {
+  background-color: var(--pastel-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.confirmButton:hover {
+  background-color: var(--pastel-secondary) !important;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.primary {
+  background: var(--pastel-primary);
+  color: var(--text-primary);
+}
+
+.primary:hover {
+  background: var(--pastel-secondary);
+} 

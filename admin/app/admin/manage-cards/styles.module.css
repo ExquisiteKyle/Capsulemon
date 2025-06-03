@@ -1,0 +1,296 @@
+.container {
+  min-height: 100vh;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--pastel-primary);
+}
+
+.withNavbar {
+  padding-top: 4rem;
+}
+
+.content {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.title {
+  font-size: 2rem;
+  color: white;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.actions {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.createButton {
+  background-color: var(--pastel-success);
+  color: var(--text-primary);
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.createButton:hover {
+  background-color: var(--pastel-secondary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.card {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.cardName {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+}
+
+.rarity {
+  padding: 0.25rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.common {
+  background-color: var(--pastel-secondary);
+  color: var(--text-primary);
+}
+
+.rare {
+  background-color: var(--pastel-primary);
+  color: var(--text-primary);
+}
+
+.epic {
+  background-color: var(--pastel-accent);
+  color: var(--text-primary);
+}
+
+.legendary {
+  background-color: var(--pastel-warning);
+  color: var(--text-primary);
+}
+
+.cardImage {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.cardDetails {
+  color: var(--text-secondary);
+}
+
+.cardDetails p {
+  margin: 0.5rem 0;
+}
+
+.error {
+  color: white;
+  text-align: center;
+  padding: 1rem;
+  background-color: var(--pastel-danger);
+  border-radius: 8px;
+  margin: 1rem;
+}
+
+/* Edit form styles */
+.editForm {
+  padding: 1.5rem;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: white;
+  font-weight: 500;
+}
+
+.formGroup input,
+.formGroup select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--pastel-primary);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.formGroup input:focus,
+.formGroup select:focus {
+  outline: none;
+  border-color: var(--pastel-accent);
+  box-shadow: 0 0 0 3px rgba(212, 165, 165, 0.1);
+}
+
+.editActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.cardActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.editButton,
+.deleteButton {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.editButton {
+  background-color: var(--pastel-primary);
+  color: var(--text-primary);
+}
+
+.editButton:hover:not(:disabled) {
+  background-color: var(--pastel-secondary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.deleteButton {
+  background-color: var(--pastel-danger);
+  color: var(--text-primary);
+}
+
+.deleteButton:hover:not(:disabled) {
+  background-color: var(--pastel-accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.editButton:disabled,
+.deleteButton:disabled {
+  background-color: #e0e0e0;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.saveButton,
+.cancelButton {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  flex: 1;
+  transition: all 0.2s ease;
+}
+
+.saveButton {
+  background-color: var(--pastel-success);
+  color: var(--text-primary);
+}
+
+.saveButton:hover {
+  background-color: var(--pastel-secondary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.cancelButton {
+  background-color: var(--pastel-danger);
+  color: var(--text-primary);
+}
+
+.cancelButton:hover {
+  background-color: var(--pastel-accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.modalContent {
+  padding: 1rem;
+}
+
+.modalContent .formGroup label {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.createForm {
+  padding: 0 1.5rem;
+}
+
+.createForm .formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.createForm .formGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.createForm .formGroup input,
+.createForm .formGroup select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--pastel-primary);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.modalActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+} 

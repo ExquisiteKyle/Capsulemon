@@ -1,0 +1,90 @@
+/* Add these rules to your global styles */
+:root {
+  /* Pastel Color Palette */
+  --pastel-primary: #95B8D1;    /* Soft blue */
+  --pastel-secondary: #B8E0D2;  /* Mint green */
+  --pastel-accent: #D4A5A5;     /* Dusty rose */
+  --pastel-warning: #F9D5A7;    /* Soft orange */
+  --pastel-danger: #F7CAC9;     /* Light coral */
+  --pastel-success: #B5D6B2;    /* Sage green */
+  
+  /* Background and Text Colors */
+  --bg-primary: #F8F9FA;
+  --bg-primary-rgb: 248, 249, 250;  /* RGB values for rgba() usage */
+  --bg-secondary: #FFFFFF;
+  --bg-secondary-rgb: 255, 255, 255;  /* RGB values for rgba() usage */
+  --text-primary: #5C5C5C;
+  --text-primary-rgb: 92, 92, 92;  /* RGB values for rgba() usage */
+  --text-secondary: #7C7C7C;
+  --text-secondary-rgb: 124, 124, 124;  /* RGB values for rgba() usage */
+  
+  /* Shadow with RGB values */
+  --shadow-color-rgb: 0, 0, 0;
+  --shadow-sm: 0 2px 4px rgba(var(--shadow-color-rgb), 0.05);
+  --shadow-md: 0 4px 6px rgba(var(--shadow-color-rgb), 0.07);
+  --shadow-lg: 0 8px 16px rgba(var(--shadow-color-rgb), 0.1);
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden; /* Prevent main page scrolling */
+  margin: 0;
+  padding: 0;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    Segoe UI,
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    Fira Sans,
+    Droid Sans,
+    Helvetica Neue,
+    sans-serif; /* Example font */
+  box-sizing: border-box;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+/* Other global styles */
+.mainContent {
+  min-height: 100vh;
+}
+
+.withNavbar {
+  padding-top: 60px; /* Must match navbar height */
+  min-height: calc(100vh - 60px);
+}
+
+/* Global button styles */
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+/* Form element styles */
+input, select, textarea {
+  background-color: var(--bg-secondary);
+  border: 1px solid #E0E0E0;
+  border-radius: 8px;
+  padding: 0.75rem;
+  color: var(--text-primary);
+  transition: all 0.2s ease-in-out;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--pastel-primary);
+  box-shadow: 0 0 0 3px rgba(149, 184, 209, 0.1);
+}
