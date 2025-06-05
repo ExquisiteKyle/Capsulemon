@@ -1,3 +1,5 @@
+// This is a Server Component
+import { Providers } from "./providers";
 import "./globals.css";
 
 export const metadata = {
@@ -9,7 +11,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <main>{children}</main>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

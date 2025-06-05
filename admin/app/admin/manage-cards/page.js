@@ -92,6 +92,8 @@ export default function ManageCards() {
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
+    if (!editFormData || !editingCard) return;
+
     try {
       const response = await updateCard(editingCard.id, editFormData);
       if (!response.ok) {
@@ -107,7 +109,7 @@ export default function ManageCards() {
                 ...editFormData,
                 element_name: elements.find(
                   (e) => e.id === parseInt(editFormData.element_id)
-                ).name,
+                )?.name,
               }
             : card
         )
@@ -170,7 +172,7 @@ export default function ManageCards() {
       // Add the new card to the list with element name
       const elementName = elements.find(
         (e) => e.id === parseInt(createFormData.element_id)
-      ).name;
+      )?.name;
       setCards([{ ...newCard.card, element_name: elementName }, ...cards]);
 
       // Reset form and close modal
@@ -229,7 +231,7 @@ export default function ManageCards() {
         <div className={styles.cardsGrid}>
           {cards.map((card) => (
             <div key={card.id} className={styles.card}>
-              {editingCard?.id === card.id ? (
+              {editingCard?.id === card.id && editFormData ? (
                 <form onSubmit={handleEditSubmit} className={styles.editForm}>
                   <div className={styles.formGroup}>
                     <label>Name:</label>
@@ -306,36 +308,34 @@ export default function ManageCards() {
                 </form>
               ) : (
                 <>
-                  <div className={styles.cardHeader}>
-                    <h2 className={styles.cardName}>{card.name}</h2>
-                    <div className={`${styles.rarity} ${styles[card.rarity]}`}>
-                      {card.rarity}
-                    </div>
-                  </div>
-                  {card.image_url && (
-                    <div className={styles.imageWrapper}>
+                  <div className={styles.cardContent}>
+                    <h3>{card.name}</h3>
+                    <p>Rarity: {card.rarity}</p>
+                    <p>Element: {card.element_name}</p>
+                    <p>Power: {card.power}</p>
+                    {card.image_url && (
                       <img
                         src={card.image_url}
                         alt={card.name}
                         className={styles.cardImage}
                       />
-                    </div>
-                  )}
-                  <div className={styles.cardInfo}>
-                    <p>Power: {card.power}</p>
-                    <p>Element: {card.element_name}</p>
+                    )}
                   </div>
                   <div className={styles.cardActions}>
                     <button
                       onClick={() => handleEdit(card)}
                       className={styles.editButton}
+                      disabled={!!editingCard || !!deletingCard}
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDelete(card)}
                       className={styles.deleteButton}
-                      disabled={deletingCard === card.id}
+                      disabled={
+                        !!editingCard ||
+                        (deletingCard && deletingCard !== card.id)
+                      }
                     >
                       {deletingCard === card.id ? "Deleting..." : "Delete"}
                     </button>
@@ -352,7 +352,6 @@ export default function ManageCards() {
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         title="Create New Card"
-        showActions={false}
       >
         <form onSubmit={handleCreateSubmit} className={styles.createForm}>
           <div className={styles.formGroup}>

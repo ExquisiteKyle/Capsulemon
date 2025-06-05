@@ -39,13 +39,29 @@ const startServer = async () => {
     // Middleware order is important
     app.use(cookieParser()); // Must be first for CSRF to work
 
+    // Configure allowed origins
+    const allowedOrigins = [
+      process.env.PROJECT_URL || process.env.ORIGIN_USER_SITE, // Project frontend
+      process.env.ADMIN_URL || process.env.ORIGIN_ADMIN_SITE, // Admin frontend
+    ];
+
     app.use(
       cors({
-        origin: process.env.ORIGIN_SITE,
+        origin: function (origin, callback) {
+          // Allow requests with no origin (like mobile apps or curl requests)
+          if (!origin) return callback(null, true);
+
+          if (allowedOrigins.indexOf(origin) === -1) {
+            const msg =
+              "The CORS policy for this site does not allow access from the specified Origin.";
+            return callback(new Error(msg), false);
+          }
+          return callback(null, true);
+        },
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       })
-    ); // Allow credentials from your frontend origin and specify allowed methods
+    );
     app.use(bodyParser.json());
 
     // Initialize authentication middleware
@@ -63,6 +79,7 @@ const startServer = async () => {
 
     app.listen(port, () => {
       console.log(`Server running on port ${port}`);
+      console.log("Allowed origins:", allowedOrigins);
     });
   } catch (err) {
     console.error("Failed to start server:", err);

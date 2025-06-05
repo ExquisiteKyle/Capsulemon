@@ -1,0 +1,14 @@
+{
+  "name": "@project-a/shared",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "dependencies": {
+    "react": "^18.0.0",
+    "next": "^14.0.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "next": "^14.0.0"
+  }
+} 
