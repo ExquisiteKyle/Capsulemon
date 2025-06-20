@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./auth": "./auth/index.js",
+    "./components": "./components/index.js"
+  },
   "dependencies": {
     "react": "^18.0.0",
     "next": "^14.0.0"

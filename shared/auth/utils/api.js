@@ -57,6 +57,17 @@ export const createAuthAPI = (API_BASE_URL) => {
   const authenticatedFetch = fetchWithAuth(API_BASE_URL);
 
   return {
+    // Auth endpoints
+    registerUser: (username, password) =>
+      fetch(`${API_BASE_URL}/auth/register`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      }),
+
     loginUser: (username, password) =>
       fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
@@ -68,13 +79,66 @@ export const createAuthAPI = (API_BASE_URL) => {
       }),
 
     logoutUser: () =>
-      authenticatedFetch("/logout", {
+      fetch(`${API_BASE_URL}/logout`, {
         method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
       }),
 
     fetchUser: () =>
       authenticatedFetch("/user", {
         method: "GET",
+      }),
+
+    // Card endpoints
+    getOwnedCards: () =>
+      authenticatedFetch("/cards/owned", {
+        method: "GET",
+      }),
+
+    getAllCards: () =>
+      authenticatedFetch("/cards", {
+        method: "GET",
+      }),
+
+    // Pack endpoints
+    getAllPacks: () =>
+      authenticatedFetch("/packs", {
+        method: "GET",
+      }),
+
+    getPack: (packId) =>
+      authenticatedFetch(`/packs/${packId}`, {
+        method: "GET",
+      }),
+
+    getPackCards: (packId) =>
+      authenticatedFetch(`/packs/${packId}/cards`, {
+        method: "GET",
+      }),
+
+    openPack: (packId) =>
+      authenticatedFetch(`/packs/${packId}/open`, {
+        method: "POST",
+      }),
+
+    // Credit endpoints
+    getUserCredits: () =>
+      authenticatedFetch("/credits", {
+        method: "GET",
+      }),
+
+    getUserInfo: () =>
+      authenticatedFetch("/credits/user-info", {
+        method: "GET",
+      }),
+
+    purchaseCredits: (amount, paymentMethod) =>
+      authenticatedFetch("/credits/purchase", {
+        method: "POST",
+        body: JSON.stringify({ amount, paymentMethod }),
       }),
   };
 };
