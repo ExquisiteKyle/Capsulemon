@@ -35,6 +35,7 @@ A modern, immersive card collection dashboard built with Next.js and Express.js,
 - **React**: Modern React with hooks and functional components
 - **CSS Modules**: Scoped styling with themed design
 - **Video Backgrounds**: HTML5 video with custom overlays
+- **Material-UI**: Admin interface components (admin app)
 
 ### Backend
 
@@ -42,6 +43,8 @@ A modern, immersive card collection dashboard built with Next.js and Express.js,
 - **Express.js**: Web application framework
 - **SQLite**: Lightweight database (perfect for this project)
 - **bcrypt**: Secure password hashing
+- **JWT**: JSON Web Tokens for authentication
+- **CSRF Protection**: Cross-site request forgery protection
 - **CORS**: Cross-origin resource sharing
 
 ### Database
@@ -73,7 +76,7 @@ A modern, immersive card collection dashboard built with Next.js and Express.js,
 
 #### Admin Authentication
 
-- **Admin Login**: Secure admin access portal
+- **Admin Login**: Secure admin access portal with glass morphism design
 
 #### Card Management
 
@@ -138,16 +141,7 @@ cd project-a
 2. **Install dependencies**
 
 ```bash
-# Install frontend dependencies
-cd project
-npm install
-
-# Install backend dependencies
-cd ../server
-npm install
-
-# Install shared dependencies
-cd ../shared
+# Install all dependencies (workspace setup)
 npm install
 ```
 
@@ -160,16 +154,24 @@ cd server
 npm run dev
 ```
 
-**Terminal 2 - Frontend:**
+**Terminal 2 - User Frontend:**
 
 ```bash
 cd project
 npm run dev
 ```
 
-4. **Access the application**
+**Terminal 3 - Admin Frontend:**
 
-- **Frontend**: http://localhost:3000
+```bash
+cd admin
+npm run dev
+```
+
+4. **Access the applications**
+
+- **User Frontend**: http://localhost:3003
+- **Admin Frontend**: http://localhost:3002
 - **Backend API**: http://localhost:3001
 
 ## 🔐 Default Credentials
@@ -190,21 +192,36 @@ The database is automatically initialized with these default users:
 
 ```
 project-a/
-├── project/                 # Next.js frontend
+├── project/                 # Next.js user frontend (port 3003)
 │   ├── app/                # App Router pages
 │   ├── components/         # React components
 │   ├── public/
 │   │   └── videos/         # Video backgrounds
 │   └── package.json
-├── server/                 # Express.js backend
-│   ├── routes/            # API routes
-│   ├── services/          # Business logic
-│   ├── middleware/        # Auth & validation
+├── admin/                  # Next.js admin frontend (port 3002)
+│   ├── app/               # Admin pages
+│   ├── components/        # Admin components
+│   ├── context/          # Admin context providers
+│   ├── utils/            # Admin utilities
 │   └── package.json
-├── shared/                # Shared components
-│   ├── auth/             # Authentication components
-│   ├── components/       # Modal components
+├── server/                # Express.js backend (port 3001)
+│   ├── routes/           # API routes
+│   │   ├── packs/        # Pack-related routes
+│   │   └── ...
+│   ├── services/         # Business logic
+│   │   ├── pack/         # Pack-related services
+│   │   └── ...
+│   ├── middleware/       # Auth & validation
+│   ├── database/         # Database initialization
+│   │   ├── schema.js     # Database schema
+│   │   ├── seedData.js   # Initial data
+│   │   └── initializer.js # Database setup
 │   └── package.json
+├── shared/               # Shared components and utilities
+│   ├── auth/            # Authentication components
+│   ├── components/      # Modal components
+│   └── package.json
+├── package.json         # Workspace configuration
 └── README.md
 ```
 
@@ -259,9 +276,10 @@ project-a/
 
 ### Adding New Features
 
-1. **Frontend**: Add components in `project/app/components/`
-2. **Backend**: Add routes in `server/routes/`
-3. **Database**: Update schema in `server/dbInitializer.js`
+1. **User Frontend**: Add components in `project/app/components/`
+2. **Admin Frontend**: Add components in `admin/app/components/`
+3. **Backend**: Add routes in `server/routes/`
+4. **Database**: Update schema in `server/database/schema.js`
 
 ### Styling Guidelines
 
@@ -282,7 +300,13 @@ project-a/
 ### Frontend (Vercel)
 
 ```bash
+# User frontend
 cd project
+npm run build
+# Deploy to Vercel
+
+# Admin frontend
+cd admin
 npm run build
 # Deploy to Vercel
 ```
