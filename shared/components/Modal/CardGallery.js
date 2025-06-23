@@ -7,12 +7,22 @@ export default function CardGallery({ cards, title }) {
     return null;
   }
 
+  // Create a more robust key generation function
+  const generateKey = (card, index) => {
+    // Try to use unique identifiers in order of preference
+    if (card.card_id) return `card-${card.card_id}`;
+    if (card.id) return `card-${card.id}`;
+    if (card.card_name) return `card-${card.card_name}-${index}`;
+    // Fallback to index with a unique prefix
+    return `card-gallery-${index}`;
+  };
+
   return (
     <div className={styles.cardSection}>
       <h4 className={styles.sectionTitle}>{title}</h4>
       <div className={styles.cardsGrid}>
         {cards.map((card, index) => (
-          <div key={index} className={styles.cardItem}>
+          <div key={generateKey(card, index)} className={styles.cardItem}>
             <div className={styles.cardImageContainer}>
               {card.image_url ? (
                 <img

@@ -100,7 +100,8 @@ export const initializeDatabase = (db) => {
           quantity INTEGER NOT NULL DEFAULT 1,
           acquired_date DATETIME DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-          FOREIGN KEY (card_id) REFERENCES cards(id) ON DELETE CASCADE
+          FOREIGN KEY (card_id) REFERENCES cards(id) ON DELETE CASCADE,
+          UNIQUE(user_id, card_id)
         )
       `
       ),

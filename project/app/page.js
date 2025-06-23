@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../shared/auth";
-import { PackResultModal, ConfirmModal } from "../../shared/components";
+import { InteractivePackReveal, ConfirmModal } from "../../shared/components";
 import Card from "./components/Card";
 import Pack from "./components/Pack";
 import Stats from "./components/Stats";
@@ -192,175 +192,207 @@ export default function Home() {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Welcome, {username}!</h1>
-        <div className={styles.headerActions}>
-          <span className={styles.credits}>Credits: {credits}</span>
+    <>
+      <video
+        key="background-video"
+        className={styles.videoBackground}
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        onError={(e) => console.error("Video error:", e)}
+        onLoadStart={() => console.log("Video loading started")}
+        onCanPlay={() => console.log("Video can play")}
+        onPlay={() => console.log("Video started playing")}
+      >
+        <source src="/videos/bg_vid.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+
+      <div className={styles.videoOverlay}></div>
+
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Welcome, {username}!</h1>
+          <div className={styles.headerActions}>
+            <span className={styles.credits}>Credits: {credits}</span>
+            <button
+              onClick={() => router.push("/purchase")}
+              className={styles.purchaseButton}
+            >
+              Purchase Credits
+            </button>
+            <button onClick={handleLogout} className={styles.logoutButton}>
+              Logout
+            </button>
+          </div>
+        </div>
+
+        {error && (
+          <div className={styles.errorContainer}>
+            <p>Error: {error}</p>
+            <button onClick={fetchUserData} className={styles.retryButton}>
+              Retry
+            </button>
+          </div>
+        )}
+
+        <div className={styles.tabContainer}>
           <button
-            onClick={() => router.push("/purchase")}
-            className={styles.purchaseButton}
+            className={`${styles.tabButton} ${
+              activeTab === "overview" ? styles.activeTab : ""
+            }`}
+            onClick={() => setActiveTab("overview")}
           >
-            Purchase Credits
+            Overview
           </button>
-          <button onClick={handleLogout} className={styles.logoutButton}>
-            Logout
+          <button
+            className={`${styles.tabButton} ${
+              activeTab === "collection" ? styles.activeTab : ""
+            }`}
+            onClick={() => setActiveTab("collection")}
+          >
+            Collection ({ownedCards.length})
+          </button>
+          <button
+            className={`${styles.tabButton} ${
+              activeTab === "packs" ? styles.activeTab : ""
+            }`}
+            onClick={() => setActiveTab("packs")}
+          >
+            Packs ({packs.length})
           </button>
         </div>
-      </div>
 
-      {error && (
-        <div className={styles.errorContainer}>
-          <p>Error: {error}</p>
-          <button onClick={fetchUserData} className={styles.retryButton}>
-            Retry
-          </button>
-        </div>
-      )}
+        <div className={styles.content}>
+          {activeTab === "overview" && (
+            <div className={styles.overviewContainer}>
+              <Stats ownedCards={ownedCards} totalCards={allCards.length} />
 
-      <div className={styles.tabContainer}>
-        <button
-          className={`${styles.tabButton} ${
-            activeTab === "overview" ? styles.activeTab : ""
-          }`}
-          onClick={() => setActiveTab("overview")}
-        >
-          Overview
-        </button>
-        <button
-          className={`${styles.tabButton} ${
-            activeTab === "collection" ? styles.activeTab : ""
-          }`}
-          onClick={() => setActiveTab("collection")}
-        >
-          Collection ({ownedCards.length})
-        </button>
-        <button
-          className={`${styles.tabButton} ${
-            activeTab === "packs" ? styles.activeTab : ""
-          }`}
-          onClick={() => setActiveTab("packs")}
-        >
-          Packs ({packs.length})
-        </button>
-      </div>
+              <div className={styles.recentCards}>
+                <h2>Recent Cards</h2>
+                {ownedCards.length > 0 ? (
+                  <div className={styles.cardsGrid}>
+                    {ownedCards.slice(0, 6).map((card, index) => (
+                      <Card
+                        key={`recent-${card.id}-${index}`}
+                        card={card}
+                        quantity={card.quantity}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <p className={styles.emptyMessage}>
+                    You don't have any cards yet. Open some packs to get
+                    started!
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
 
-      <div className={styles.content}>
-        {activeTab === "overview" && (
-          <div className={styles.overviewContainer}>
-            <Stats ownedCards={ownedCards} totalCards={allCards.length} />
-
-            <div className={styles.recentCards}>
-              <h2>Recent Cards</h2>
+          {activeTab === "collection" && (
+            <div className={styles.collectionContainer}>
+              <h2>Your Card Collection</h2>
               {ownedCards.length > 0 ? (
                 <div className={styles.cardsGrid}>
-                  {ownedCards.slice(0, 6).map((card) => (
-                    <Card key={card.id} card={card} quantity={card.quantity} />
+                  {ownedCards.map((card, index) => (
+                    <Card
+                      key={`collection-${card.id}-${index}`}
+                      card={card}
+                      quantity={card.quantity}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className={styles.emptyContainer}>
+                  <p className={styles.emptyMessage}>
+                    Your collection is empty. Open some packs to get cards!
+                  </p>
+                  <button
+                    className={styles.openPacksButton}
+                    onClick={() => setActiveTab("packs")}
+                  >
+                    Browse Packs
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === "packs" && (
+            <div className={styles.packsContainer}>
+              <h2>Available Packs</h2>
+              {packs.length > 0 ? (
+                <div className={styles.packsGrid}>
+                  {packs.map((pack) => (
+                    <Pack
+                      key={pack.id}
+                      pack={pack}
+                      onOpen={handlePackOpen}
+                      userCredits={credits}
+                    />
                   ))}
                 </div>
               ) : (
                 <p className={styles.emptyMessage}>
-                  You don't have any cards yet. Open some packs to get started!
+                  No packs are currently available.
                 </p>
               )}
             </div>
-          </div>
+          )}
+        </div>
+
+        {/* Interactive Pack Reveal Modal */}
+        {isModalOpen && packResult && (
+          <InteractivePackReveal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            packName={packResult.packName}
+            drawnCards={packResult.drawnCards}
+            onRevealComplete={() => {
+              // Optional: Add any additional logic when reveal is complete
+              console.log("Pack reveal completed!");
+            }}
+          />
         )}
 
-        {activeTab === "collection" && (
-          <div className={styles.collectionContainer}>
-            <h2>Your Card Collection</h2>
-            {ownedCards.length > 0 ? (
-              <div className={styles.cardsGrid}>
-                {ownedCards.map((card) => (
-                  <Card key={card.id} card={card} quantity={card.quantity} />
-                ))}
-              </div>
-            ) : (
-              <div className={styles.emptyContainer}>
-                <p className={styles.emptyMessage}>
-                  Your collection is empty. Open some packs to get cards!
-                </p>
-                <button
-                  className={styles.openPacksButton}
-                  onClick={() => setActiveTab("packs")}
-                >
-                  Browse Packs
-                </button>
-              </div>
-            )}
-          </div>
+        {/* Confirm Pack Opening Modal */}
+        {isConfirmModalOpen && packToOpen && (
+          <ConfirmModal
+            isOpen={isConfirmModalOpen}
+            onClose={() => {
+              setIsConfirmModalOpen(false);
+              setPackToOpen(null);
+            }}
+            onConfirm={confirmPackOpen}
+            title="Confirm Pack Opening"
+            message={`Are you sure you want to open "${packToOpen.name}" for ${packToOpen.cost} credits?`}
+            confirmText="Open Pack"
+            cancelText="Cancel"
+          />
         )}
 
-        {activeTab === "packs" && (
-          <div className={styles.packsContainer}>
-            <h2>Available Packs</h2>
-            {packs.length > 0 ? (
-              <div className={styles.packsGrid}>
-                {packs.map((pack) => (
-                  <Pack
-                    key={pack.id}
-                    pack={pack}
-                    onOpen={handlePackOpen}
-                    userCredits={credits}
-                  />
-                ))}
-              </div>
-            ) : (
-              <p className={styles.emptyMessage}>
-                No packs are currently available.
-              </p>
-            )}
-          </div>
+        {/* Error Modal */}
+        {isErrorModalOpen && errorMessage && (
+          <ConfirmModal
+            isOpen={isErrorModalOpen}
+            onClose={() => {
+              setIsErrorModalOpen(false);
+              setErrorMessage(null);
+            }}
+            onConfirm={() => {
+              setIsErrorModalOpen(false);
+              setErrorMessage(null);
+            }}
+            title="Error"
+            message={errorMessage}
+            confirmText="OK"
+            showCancel={false}
+          />
         )}
       </div>
-
-      {/* Pack Result Modal */}
-      {isModalOpen && packResult && (
-        <PackResultModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          packName={packResult.packName}
-          drawnCards={packResult.drawnCards}
-          creditsSpent={packResult.creditsSpent}
-          remainingCredits={packResult.remainingCredits}
-        />
-      )}
-
-      {/* Confirm Pack Opening Modal */}
-      {isConfirmModalOpen && packToOpen && (
-        <ConfirmModal
-          isOpen={isConfirmModalOpen}
-          onClose={() => {
-            setIsConfirmModalOpen(false);
-            setPackToOpen(null);
-          }}
-          onConfirm={confirmPackOpen}
-          title="Confirm Pack Opening"
-          message={`Are you sure you want to open "${packToOpen.name}" for ${packToOpen.cost} credits?`}
-          confirmText="Open Pack"
-          cancelText="Cancel"
-        />
-      )}
-
-      {/* Error Modal */}
-      {isErrorModalOpen && errorMessage && (
-        <ConfirmModal
-          isOpen={isErrorModalOpen}
-          onClose={() => {
-            setIsErrorModalOpen(false);
-            setErrorMessage(null);
-          }}
-          onConfirm={() => {
-            setIsErrorModalOpen(false);
-            setErrorMessage(null);
-          }}
-          title="Error"
-          message={errorMessage}
-          confirmText="OK"
-          showCancel={false}
-        />
-      )}
-    </div>
+    </>
   );
 }

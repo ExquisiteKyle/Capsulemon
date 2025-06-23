@@ -310,65 +310,75 @@ const assignCardsToUser = (db, userId, cards) =>
       return resolve(assignedCards);
     }
 
-    cards.forEach((card) => {
-      // Check if user already has this card
-      db.get(
-        "SELECT id, quantity FROM owned_cards WHERE user_id = ? AND card_id = ?",
-        [userId, card.card_id],
-        (err, existingCard) => {
-          if (err) {
-            console.error("Check existing card DB error:", err);
-            return reject(err);
+    // Use a transaction to ensure data consistency
+    db.serialize(() => {
+      db.run("BEGIN TRANSACTION");
+
+      cards.forEach((card) => {
+        // Check if user already has this card
+        db.get(
+          "SELECT id, quantity FROM owned_cards WHERE user_id = ? AND card_id = ?",
+          [userId, card.card_id],
+          (err, existingCard) => {
+            if (err) {
+              console.error("Check existing card DB error:", err);
+              db.run("ROLLBACK");
+              return reject(err);
+            }
+
+            if (existingCard) {
+              // Update existing card quantity
+              db.run(
+                "UPDATE owned_cards SET quantity = quantity + 1 WHERE id = ?",
+                [existingCard.id],
+                function (err) {
+                  if (err) {
+                    console.error("Update quantity DB error:", err);
+                    db.run("ROLLBACK");
+                    return reject(err);
+                  }
+
+                  assignedCards.push({
+                    ...card,
+                    quantity: existingCard.quantity + 1,
+                    isNew: false,
+                  });
+
+                  completed++;
+                  if (completed === cards.length) {
+                    db.run("COMMIT");
+                    resolve(assignedCards);
+                  }
+                }
+              );
+            } else {
+              // Insert new card
+              db.run(
+                "INSERT INTO owned_cards (user_id, card_id, quantity) VALUES (?, ?, 1)",
+                [userId, card.card_id],
+                function (err) {
+                  if (err) {
+                    console.error("Assign card DB error:", err);
+                    db.run("ROLLBACK");
+                    return reject(err);
+                  }
+
+                  assignedCards.push({
+                    ...card,
+                    quantity: 1,
+                    isNew: true,
+                  });
+
+                  completed++;
+                  if (completed === cards.length) {
+                    db.run("COMMIT");
+                    resolve(assignedCards);
+                  }
+                }
+              );
+            }
           }
-
-          if (existingCard) {
-            // Update existing card quantity
-            db.run(
-              "UPDATE owned_cards SET quantity = quantity + 1 WHERE id = ?",
-              [existingCard.id],
-              function (err) {
-                if (err) {
-                  console.error("Update quantity DB error:", err);
-                  return reject(err);
-                }
-
-                assignedCards.push({
-                  ...card,
-                  quantity: existingCard.quantity + 1,
-                  isNew: false,
-                });
-
-                completed++;
-                if (completed === cards.length) {
-                  resolve(assignedCards);
-                }
-              }
-            );
-          } else {
-            // Insert new card
-            db.run(
-              "INSERT INTO owned_cards (user_id, card_id, quantity) VALUES (?, ?, 1)",
-              [userId, card.card_id],
-              function (err) {
-                if (err) {
-                  console.error("Assign card DB error:", err);
-                  return reject(err);
-                }
-
-                assignedCards.push({
-                  ...card,
-                  quantity: 1,
-                  isNew: true,
-                });
-
-                completed++;
-                if (completed === cards.length) {
-                  resolve(assignedCards);
-                }
-              }
-            );
-          }
-        }
-      );
+        );
+      });
     });
   });

@@ -1,25 +1,154 @@
+/* Video background element - now global */
+.videoBackground {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: -3;
+  opacity: 1; /* Increased opacity to make video more visible */
+  background: #000; /* Black background while video loads */
+  pointer-events: none; /* Prevent video from capturing mouse events */
+}
+
+/* Dark overlay for the video background */
+.videoOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5); /* Dark overlay */
+  z-index: -2; /* Between video and container */
+  pointer-events: none;
+}
+
 .container {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
+  min-height: 100vh;
+  color: #ffffff;
+  position: relative;
+  border-radius: 16px;
+  box-shadow: 
+    0 0 50px rgba(102, 126, 234, 0.2),
+    inset 0 0 50px rgba(255, 255, 255, 0.02);
+  animation: containerGlow 10s ease-in-out infinite;
+  overflow: hidden;
+  /* Fallback background in case video doesn't load */
+  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+  z-index: 1; /* Ensure container is above video */
+}
+
+@keyframes containerGlow {
+  0%, 100% {
+    box-shadow: 
+      0 0 50px rgba(102, 126, 234, 0.2),
+      inset 0 0 50px rgba(255, 255, 255, 0.02);
+  }
+  50% {
+    box-shadow: 
+      0 0 80px rgba(102, 126, 234, 0.3),
+      inset 0 0 80px rgba(255, 255, 255, 0.05);
+  }
+}
+
+/* Overlay to ensure content readability */
+.container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    linear-gradient(135deg, rgba(15, 15, 35, 0.7) 0%, rgba(26, 26, 46, 0.7) 50%, rgba(22, 33, 62, 0.7) 100%),
+    /* Circuit board pattern */
+    linear-gradient(90deg, transparent 98%, rgba(102, 126, 234, 0.1) 98.5%, transparent 99%),
+    linear-gradient(0deg, transparent 98%, rgba(102, 126, 234, 0.1) 98.5%, transparent 99%),
+    /* Hexagonal grid */
+    radial-gradient(circle at 50% 50%, transparent 0, transparent 60px, rgba(255, 215, 0, 0.05) 60px, rgba(255, 215, 0, 0.05) 62px, transparent 62px),
+    /* Tech dots */
+    radial-gradient(3px 3px at 50px 50px, rgba(102, 126, 234, 0.2), transparent),
+    radial-gradient(2px 2px at 150px 100px, rgba(255, 215, 0, 0.15), transparent),
+    radial-gradient(2px 2px at 250px 200px, rgba(255, 119, 198, 0.15), transparent),
+    radial-gradient(3px 3px at 350px 150px, rgba(120, 219, 255, 0.15), transparent),
+    radial-gradient(2px 2px at 450px 250px, rgba(102, 126, 234, 0.1), transparent),
+    /* Diagonal tech lines */
+    linear-gradient(45deg, transparent 40%, rgba(255, 119, 198, 0.08) 40%, rgba(255, 119, 198, 0.08) 42%, transparent 42%),
+    linear-gradient(-45deg, transparent 40%, rgba(120, 219, 255, 0.08) 40%, rgba(120, 219, 255, 0.08) 42%, transparent 42%),
+    /* Subtle grid overlay */
+    linear-gradient(rgba(102, 126, 234, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(102, 126, 234, 0.03) 1px, transparent 1px);
+  background-size: 
+    100% 100%,
+    100px 100px,
+    100px 100px,
+    120px 120px,
+    200px 200px,
+    200px 200px,
+    200px 200px,
+    200px 200px,
+    200px 200px,
+    300px 300px,
+    300px 300px,
+    50px 50px,
+    50px 50px;
+  background-position: 
+    0 0,
+    0 0,
+    0 0,
+    0 0,
+    0 0,
+    0 0,
+    0 0,
+    0 0,
+    0 0,
+    0 0,
+    0 0,
+    0 0,
+    0 0;
+  pointer-events: none;
+  z-index: -1;
+  border-radius: 16px;
+  animation: backgroundFloat 20s ease-in-out infinite;
+}
+
+/* Ensure all content is above the video and overlay */
+.header,
+.content,
+.tabContainer {
+  position: relative;
+  z-index: 2;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid #e5e7eb;
+  padding: 1.5rem 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  margin-bottom: 1rem;
 }
 
 .title {
   font-size: 2.5rem;
-  font-weight: bold;
-  color: #1f2937;
+  font-weight: 800;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin: 0;
+  text-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
 }
 
 .headerActions {
@@ -30,112 +159,165 @@
 
 .credits {
   font-size: 1.1rem;
-  font-weight: 600;
-  color: #3b82f6;
-  background: #eff6ff;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  border: 1px solid #dbeafe;
+  font-weight: 700;
+  color: #ffd700;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 215, 0, 0.1) 100%);
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 215, 0, 0.3);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
 .purchaseButton {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #00d4aa 0%, #0099cc 100%);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
   font-size: 1rem;
-  font-weight: 500;
-  transition: transform 0.2s;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 212, 170, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .purchaseButton:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 212, 170, 0.6);
+  background: linear-gradient(135deg, #00e6b8 0%, #00b3e6 100%);
 }
 
 .logoutButton {
-  background-color: #dc3545;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
   font-size: 1rem;
-  font-weight: 500;
-  transition: background-color 0.2s;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .logoutButton:hover {
-  background-color: #c82333;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+  background: linear-gradient(135deg, #ff7b7b 0%, #ff6b6b 100%);
 }
 
 .loadingContainer {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 200px;
+  min-height: 300px;
   font-size: 1.2rem;
-  color: #6b7280;
+  color: #a0a0a0;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .errorContainer {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 8px;
-  padding: 1rem;
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(238, 90, 82, 0.1) 100%);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  border-radius: 12px;
+  padding: 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #dc2626;
+  color: #ff6b6b;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.2);
 }
 
 .retryButton {
-  background: #dc2626;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
 }
 
 .retryButton:hover {
-  background: #b91c1c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
 }
 
 .tabContainer {
   display: flex;
   gap: 0.5rem;
-  border-bottom: 2px solid #e5e7eb;
-  padding-bottom: 0;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .tabButton {
-  background: none;
+  background: transparent;
   border: none;
   padding: 1rem 1.5rem;
   font-size: 1rem;
-  font-weight: 500;
-  color: #6b7280;
+  font-weight: 600;
+  color: #a0a0a0;
   cursor: pointer;
-  border-bottom: 3px solid transparent;
-  transition: all 0.2s;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.tabButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.tabButton:hover::before {
+  left: 100%;
 }
 
 .tabButton:hover {
-  color: #3b82f6;
-  background: #f8fafc;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
 }
 
 .activeTab {
-  color: #3b82f6;
-  border-bottom-color: #3b82f6;
-  background: #eff6ff;
+  color: #ffffff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  transform: translateY(-2px);
 }
 
 .content {
-  min-height: 400px;
+  min-height: 500px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .overviewContainer {
@@ -145,55 +327,141 @@
 }
 
 .recentCards h2 {
-  margin: 0 0 1rem 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1f2937;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .cardsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
 }
 
 .collectionContainer h2,
 .packsContainer h2 {
-  margin: 0 0 1.5rem 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1f2937;
+  margin: 0 0 2rem 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .packsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.5rem;
 }
 
 .emptyContainer {
   text-align: center;
-  padding: 3rem 1rem;
+  padding: 4rem 2rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
 }
 
 .emptyMessage {
-  font-size: 1.1rem;
-  color: #6b7280;
-  margin: 0 0 1.5rem 0;
+  font-size: 1.2rem;
+  color: #a0a0a0;
+  margin: 0 0 2rem 0;
+  font-weight: 500;
 }
 
 .openPacksButton {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 500;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .openPacksButton:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+  background: linear-gradient(135deg, #768fee 0%, #865bb2 100%);
+}
+
+/* Animation for loading states */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.loadingContainer p {
+  animation: pulse 2s infinite;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    padding: 0.5rem;
+  }
+  
+  .header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .headerActions {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .tabContainer {
+    flex-direction: column;
+  }
+  
+  .cardsGrid,
+  .packsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@keyframes backgroundFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-10px) rotate(0.5deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(-0.5deg);
+  }
+  75% {
+    transform: translateY(-15px) rotate(0.3deg);
+  }
+}
+
+@keyframes circuitPulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.02);
+  }
 } 

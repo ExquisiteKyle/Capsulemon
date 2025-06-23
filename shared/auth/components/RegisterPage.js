@@ -47,67 +47,84 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.loginBox}>
-        <h1>Register</h1>
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.formGroup}>
-            <label htmlFor="username">Username</label>
-            <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              disabled={isLoading}
-              minLength={3}
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={isLoading}
-              minLength={6}
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              disabled={isLoading}
-            />
-          </div>
-          {error && <div className={styles.error}>{error}</div>}
-          <button
-            type="submit"
-            className={styles.submitButton}
-            disabled={isLoading}
-          >
-            {isLoading ? "Registering..." : "Register"}
-          </button>
-        </form>
-        <div className={styles.registerLink}>
-          <p>
-            Already have an account?{" "}
+    <>
+      <video
+        key="register-background-video"
+        className={styles.videoBackground}
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+      >
+        <source src="/videos/bg_vid.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+
+      <div className={styles.videoOverlay}></div>
+
+      <div className={styles.container}>
+        <div className={styles.loginBox}>
+          <h1>Register</h1>
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.formGroup}>
+              <label htmlFor="username">Username</label>
+              <input
+                type="text"
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                disabled={isLoading}
+                minLength={3}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={isLoading}
+                minLength={6}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label htmlFor="confirmPassword">Confirm Password</label>
+              <input
+                type="password"
+                id="confirmPassword"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                disabled={isLoading}
+              />
+            </div>
+            {error && <div className={styles.error}>{error}</div>}
             <button
-              type="button"
-              onClick={() => router.push("/login")}
-              className={styles.linkButton}
+              type="submit"
+              className={styles.submitButton}
+              disabled={isLoading}
             >
-              Login here
+              {isLoading ? "Registering..." : "Register"}
             </button>
-          </p>
+          </form>
+          <div className={styles.registerLink}>
+            <p>
+              Already have an account?{" "}
+              <button
+                type="button"
+                onClick={() => router.push("/login")}
+                className={styles.linkButton}
+              >
+                Login here
+              </button>
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

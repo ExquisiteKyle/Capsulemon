@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Video Test</title>
+    <style>
+      body {
+        background: #000;
+        color: white;
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+      video {
+        width: 100%;
+        max-width: 800px;
+        height: auto;
+        border: 2px solid #667eea;
+        border-radius: 8px;
+      }
+      .status {
+        margin: 20px 0;
+        padding: 10px;
+        background: #333;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Video Background Test</h1>
+    <div class="status" id="status">Loading...</div>
+
+    <video
+      id="testVideo"
+      controls
+      autoplay
+      loop
+      muted
+      playsinline
+      preload="auto"
+      onError="handleError"
+      onLoadStart="handleLoadStart"
+      onCanPlay="handleCanPlay"
+      onPlay="handlePlay"
+    >
+      <source src="/videos/bg_vid.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+
+    <script>
+      const status = document.getElementById("status");
+      const video = document.getElementById("testVideo");
+
+      function handleError(e) {
+        status.innerHTML = "❌ Video Error: " + e.message;
+        status.style.background = "#ff4444";
+      }
+
+      function handleLoadStart() {
+        status.innerHTML = "🔄 Video loading started...";
+        status.style.background = "#ffaa00";
+      }
+
+      function handleCanPlay() {
+        status.innerHTML = "✅ Video can play!";
+        status.style.background = "#44ff44";
+      }
+
+      function handlePlay() {
+        status.innerHTML = "▶️ Video is playing!";
+        status.style.background = "#44ff44";
+      }
+
+      // Check if video loads
+      setTimeout(() => {
+        if (video.readyState === 0) {
+          status.innerHTML = "❌ Video failed to load";
+          status.style.background = "#ff4444";
+        }
+      }, 5000);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,542 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+  overflow: hidden;
+}
+
+.modal {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  border-radius: 0;
+  padding: 2rem;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  box-shadow: none;
+  border: none;
+  animation: modalSlideIn 0.5s ease-out;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 3px solid rgba(74, 144, 226, 0.4);
+  flex-shrink: 0;
+}
+
+.title {
+  color: #ffffff;
+  font-size: 3rem;
+  font-weight: 800;
+  margin: 0;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.7);
+  background: linear-gradient(135deg, #4a90e2, #357abd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.skipButton {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 16px rgba(255, 107, 107, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.skipButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(255, 107, 107, 0.6);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  flex: 1;
+  justify-content: center;
+  min-height: 0;
+}
+
+.cardsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  max-height: 60vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  border: 2px solid rgba(74, 144, 226, 0.3);
+  backdrop-filter: blur(10px);
+  /* Always show scrollbar to prevent layout shift */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(74, 144, 226, 0.6) transparent;
+  /* Force scrollbar to always be visible */
+  scrollbar-gutter: stable;
+}
+
+/* Webkit scrollbar styling */
+.cardsContainer::-webkit-scrollbar {
+  width: 8px;
+  /* Always show scrollbar */
+  -webkit-appearance: none;
+}
+
+.cardsContainer::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 4px;
+}
+
+.cardsContainer::-webkit-scrollbar-thumb {
+  background: rgba(74, 144, 226, 0.6);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  /* Always show scrollbar thumb */
+  min-height: 40px;
+}
+
+.cardsContainer::-webkit-scrollbar-thumb:hover {
+  background: rgba(74, 144, 226, 0.8);
+  background-clip: content-box;
+}
+
+/* Force scrollbar to always be visible on webkit browsers */
+.cardsContainer::-webkit-scrollbar-thumb:vertical {
+  background: rgba(74, 144, 226, 0.6);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  min-height: 40px;
+}
+
+.cardSlot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.4s ease;
+  position: relative;
+}
+
+.cardSlot.revealable {
+  transform: scale(1.05);
+  z-index: 10;
+  cursor: pointer;
+}
+
+.cardSlot.revealable:hover {
+  transform: scale(1.1);
+}
+
+.cardSlot.revealed {
+  animation: cardReveal 1s ease-out;
+}
+
+@keyframes cardReveal {
+  0% {
+    transform: rotateY(0deg) scale(1);
+  }
+  50% {
+    transform: rotateY(90deg) scale(1.2);
+  }
+  100% {
+    transform: rotateY(0deg) scale(1);
+  }
+}
+
+.maskedCard {
+  width: 100%;
+  height: 280px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.4s ease;
+}
+
+.maskedCard:hover {
+  transform: translateY(-10px);
+}
+
+.cardBack {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #2c3e50, #34495e);
+  border-radius: 16px;
+  border: 4px solid #4a90e2;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.cardBackPattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding: 2rem;
+  opacity: 0.4;
+}
+
+.patternLine {
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #4a90e2, transparent);
+  border-radius: 2px;
+}
+
+.cardBackText {
+  font-size: 5rem;
+  font-weight: 800;
+  color: #4a90e2;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.7);
+  z-index: 1;
+}
+
+.tapIndicator {
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #4a90e2, #357abd);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 25px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 8px 16px rgba(74, 144, 226, 0.4);
+  animation: pulse 2s infinite;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.08);
+  }
+}
+
+.revealedCard {
+  width: 100%;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  border: 3px solid #4a90e2;
+  animation: cardGlow 3s ease-out;
+}
+
+@keyframes cardGlow {
+  0% {
+    box-shadow: 0 8px 24px rgba(74, 144, 226, 0.5);
+  }
+  50% {
+    box-shadow: 0 16px 40px rgba(74, 144, 226, 0.8);
+  }
+  100% {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.cardImageContainer {
+  position: relative;
+  width: 100%;
+  height: 120px;
+  margin-bottom: 1rem;
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(45deg, #6c757d, #495057);
+}
+
+.cardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 12px;
+  background: linear-gradient(45deg, #6c757d, #495057);
+}
+
+.cardImagePlaceholder {
+  display: none;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(45deg, #6c757d, #495057);
+  color: white;
+  font-size: 1rem;
+  text-align: center;
+  padding: 0.5rem;
+  word-break: break-word;
+}
+
+.cardDetails {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+.cardName {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #333;
+  text-align: center;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.cardRarity {
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.common {
+  background-color: #6c757d;
+  color: white;
+}
+
+.uncommon {
+  background-color: #28a745;
+  color: white;
+}
+
+.rare {
+  background-color: #007bff;
+  color: white;
+}
+
+.epic {
+  background-color: #6f42c1;
+  color: white;
+}
+
+.legendary {
+  background-color: #fd7e14;
+  color: white;
+}
+
+.cardElement {
+  font-size: 1rem;
+  color: #666;
+  font-weight: 600;
+}
+
+.cardQuantity {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #007bff;
+  background-color: rgba(0, 123, 255, 0.1);
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+}
+
+.progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.progressBar {
+  width: 100%;
+  max-width: 600px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 2px solid rgba(74, 144, 226, 0.3);
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #4a90e2, #357abd);
+  border-radius: 6px;
+  transition: width 0.6s ease;
+  box-shadow: 0 0 20px rgba(74, 144, 226, 0.6);
+}
+
+.progressText {
+  color: #ffffff;
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.footer {
+  margin-top: 3rem;
+  display: flex;
+  justify-content: center;
+  animation: slideUp 0.8s ease-out;
+  flex-shrink: 0;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.completeButton {
+  background: linear-gradient(135deg, #4a90e2, #357abd);
+  color: white;
+  border: none;
+  padding: 1.5rem 3rem;
+  border-radius: 16px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  box-shadow: 0 12px 24px rgba(74, 144, 226, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.completeButton:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 32px rgba(74, 144, 226, 0.6);
+}
+
+.completeButton:active {
+  transform: translateY(-2px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .cardsContainer {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .maskedCard {
+    height: 250px;
+  }
+  
+  .cardBackText {
+    font-size: 4rem;
+  }
+  
+  .title {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal {
+    padding: 1.5rem;
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .cardsContainer {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    max-height: 50vh;
+    padding: 1.5rem;
+  }
+  
+  .maskedCard {
+    height: 220px;
+  }
+  
+  .cardBackText {
+    font-size: 3.5rem;
+  }
+  
+  .tapIndicator {
+    font-size: 1rem;
+    padding: 0.8rem 1.5rem;
+  }
+  
+  .skipButton {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+  }
+  
+  .completeButton {
+    padding: 1.2rem 2.5rem;
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cardsContainer {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+  
+  .maskedCard {
+    height: 180px;
+  }
+  
+  .cardBackText {
+    font-size: 2.5rem;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+  }
+  
+  .header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+} 

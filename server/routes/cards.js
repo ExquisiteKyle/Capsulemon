@@ -2,6 +2,7 @@ import express from "express";
 import {
   createCard,
   getCards,
+  getAllCards,
   updateCard,
   deleteCard,
 } from "../services/cardService.js";
@@ -40,7 +41,7 @@ export default (db, { authenticateUser, requireAdmin }) => {
   // Get all available cards
   router.get("/", authenticateUser, async (req, res) => {
     try {
-      const cards = await getCards(db);
+      const cards = await getAllCards(db);
       res.json(cards);
     } catch (error) {
       console.error("Error fetching cards:", error);

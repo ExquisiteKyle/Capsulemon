@@ -1,51 +1,61 @@
 // Function to assign a card to a user
 export const assignCardToUser = (db, userId, cardId, quantity = 1) => {
   return new Promise((resolve, reject) => {
-    // First check if the user already has this card
-    db.get(
-      "SELECT id, quantity FROM owned_cards WHERE user_id = ? AND card_id = ?",
-      [userId, cardId],
-      (err, existingCard) => {
-        if (err) {
-          console.error("Check existing card DB error:", err);
-          reject(err);
-          return;
-        }
+    // Use a transaction to ensure data consistency
+    db.serialize(() => {
+      db.run("BEGIN TRANSACTION");
 
-        if (existingCard) {
-          // Update existing card quantity
-          db.run(
-            "UPDATE owned_cards SET quantity = quantity + ? WHERE id = ?",
-            [quantity, existingCard.id],
-            function (err) {
-              if (err) {
-                console.error("Update quantity DB error:", err);
-                reject(err);
-                return;
+      // First check if the user already has this card
+      db.get(
+        "SELECT id, quantity FROM owned_cards WHERE user_id = ? AND card_id = ?",
+        [userId, cardId],
+        (err, existingCard) => {
+          if (err) {
+            console.error("Check existing card DB error:", err);
+            db.run("ROLLBACK");
+            reject(err);
+            return;
+          }
+
+          if (existingCard) {
+            // Update existing card quantity
+            db.run(
+              "UPDATE owned_cards SET quantity = quantity + ? WHERE id = ?",
+              [quantity, existingCard.id],
+              function (err) {
+                if (err) {
+                  console.error("Update quantity DB error:", err);
+                  db.run("ROLLBACK");
+                  reject(err);
+                  return;
+                }
+                db.run("COMMIT");
+                resolve({
+                  id: existingCard.id,
+                  quantity: existingCard.quantity + quantity,
+                });
               }
-              resolve({
-                id: existingCard.id,
-                quantity: existingCard.quantity + quantity,
-              });
-            }
-          );
-        } else {
-          // Insert new card
-          db.run(
-            "INSERT INTO owned_cards (user_id, card_id, quantity) VALUES (?, ?, ?)",
-            [userId, cardId, quantity],
-            function (err) {
-              if (err) {
-                console.error("Assign card DB error:", err);
-                reject(err);
-                return;
+            );
+          } else {
+            // Insert new card
+            db.run(
+              "INSERT INTO owned_cards (user_id, card_id, quantity) VALUES (?, ?, ?)",
+              [userId, cardId, quantity],
+              function (err) {
+                if (err) {
+                  console.error("Assign card DB error:", err);
+                  db.run("ROLLBACK");
+                  reject(err);
+                  return;
+                }
+                db.run("COMMIT");
+                resolve({ id: this.lastID, quantity });
               }
-              resolve({ id: this.lastID, quantity });
-            }
-          );
+            );
+          }
         }
-      }
-    );
+      );
+    });
   });
 };
 

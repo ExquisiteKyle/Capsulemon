@@ -54,6 +54,24 @@ export const updateCard = (db, cardId, cardData) => {
   });
 };
 
+// Function to get all available cards
+export const getAllCards = (db) =>
+  new Promise((resolve, reject) => {
+    db.all(
+      `SELECT c.id, c.name, c.rarity, c.power, c.image_url, e.name as element_name 
+       FROM cards c 
+       JOIN elements e ON c.element_id = e.id
+       ORDER BY c.name ASC`,
+      (err, cards) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve(cards);
+      }
+    );
+  });
+
 // Function to get cards owned by a specific user
 export const getCards = (db, userId) =>
   new Promise((resolve, reject) => {
