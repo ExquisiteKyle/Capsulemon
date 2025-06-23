@@ -3,8 +3,12 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./styles.module.css";
-import Modal from "@/components/common/Modal";
 import { useAuth } from "@/context/AuthContext";
+import {
+  CardsGrid,
+  CreateCardModal,
+  DeleteCardModal,
+} from "@/components/cards";
 import {
   fetchAllCards,
   fetchElements,
@@ -228,218 +232,40 @@ export default function ManageCards() {
             Create New Card
           </button>
         </div>
-        <div className={styles.cardsGrid}>
-          {cards.map((card) => (
-            <div key={card.id} className={styles.card}>
-              {editingCard?.id === card.id && editFormData ? (
-                <form onSubmit={handleEditSubmit} className={styles.editForm}>
-                  <div className={styles.formGroup}>
-                    <label>Name:</label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={editFormData.name}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>Rarity:</label>
-                    <select
-                      name="rarity"
-                      value={editFormData.rarity}
-                      onChange={handleInputChange}
-                      required
-                    >
-                      <option value="common">Common</option>
-                      <option value="rare">Rare</option>
-                      <option value="epic">Epic</option>
-                      <option value="legendary">Legendary</option>
-                    </select>
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>Element:</label>
-                    <select
-                      name="element_id"
-                      value={editFormData.element_id}
-                      onChange={handleInputChange}
-                      required
-                    >
-                      <option value="">Select Element</option>
-                      {elements.map((element) => (
-                        <option key={element.id} value={element.id}>
-                          {element.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>Power:</label>
-                    <input
-                      type="number"
-                      name="power"
-                      value={editFormData.power}
-                      onChange={handleInputChange}
-                      required
-                      min="0"
-                    />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>Image URL:</label>
-                    <input
-                      type="url"
-                      name="image_url"
-                      value={editFormData.image_url}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                  <div className={styles.formActions}>
-                    <button type="submit" className={styles.saveButton}>
-                      Save
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleCancelEdit}
-                      className={styles.cancelButton}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <>
-                  <div className={styles.cardContent}>
-                    <h3>{card.name}</h3>
-                    <p>Rarity: {card.rarity}</p>
-                    <p>Element: {card.element_name}</p>
-                    <p>Power: {card.power}</p>
-                    {card.image_url && (
-                      <img
-                        src={card.image_url}
-                        alt={card.name}
-                        className={styles.cardImage}
-                      />
-                    )}
-                  </div>
-                  <div className={styles.cardActions}>
-                    <button
-                      onClick={() => handleEdit(card)}
-                      className={styles.editButton}
-                      disabled={!!editingCard || !!deletingCard}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(card)}
-                      className={styles.deleteButton}
-                      disabled={
-                        !!editingCard ||
-                        (deletingCard && deletingCard !== card.id)
-                      }
-                    >
-                      {deletingCard === card.id ? "Deleting..." : "Delete"}
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
-        </div>
+
+        <CardsGrid
+          cards={cards}
+          elements={elements}
+          editingCard={editingCard}
+          editFormData={editFormData}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onSave={handleEditSubmit}
+          onCancel={handleCancelEdit}
+          onInputChange={handleInputChange}
+          deletingCard={deletingCard}
+        />
       </div>
 
-      {/* Create Card Modal */}
-      <Modal
+      <CreateCardModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
-        title="Create New Card"
-      >
-        <form onSubmit={handleCreateSubmit} className={styles.createForm}>
-          <div className={styles.formGroup}>
-            <label>Name:</label>
-            <input
-              type="text"
-              name="name"
-              value={createFormData.name}
-              onChange={handleCreateInputChange}
-              required
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label>Rarity:</label>
-            <select
-              name="rarity"
-              value={createFormData.rarity}
-              onChange={handleCreateInputChange}
-              required
-            >
-              <option value="common">Common</option>
-              <option value="rare">Rare</option>
-              <option value="epic">Epic</option>
-              <option value="legendary">Legendary</option>
-            </select>
-          </div>
-          <div className={styles.formGroup}>
-            <label>Element:</label>
-            <select
-              name="element_id"
-              value={createFormData.element_id}
-              onChange={handleCreateInputChange}
-              required
-            >
-              <option value="">Select Element</option>
-              {elements.map((element) => (
-                <option key={element.id} value={element.id}>
-                  {element.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className={styles.formGroup}>
-            <label>Power:</label>
-            <input
-              type="number"
-              name="power"
-              value={createFormData.power}
-              onChange={handleCreateInputChange}
-              required
-              min="0"
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label>Image URL:</label>
-            <input
-              type="url"
-              name="image_url"
-              value={createFormData.image_url}
-              onChange={handleCreateInputChange}
-            />
-          </div>
-          <div className={styles.modalActions}>
-            <button
-              type="button"
-              onClick={() => setShowCreateModal(false)}
-              className={styles.cancelButton}
-            >
-              Cancel
-            </button>
-            <button type="submit" className={styles.saveButton}>
-              Create Card
-            </button>
-          </div>
-        </form>
-      </Modal>
+        onSubmit={handleCreateSubmit}
+        formData={createFormData}
+        onInputChange={handleCreateInputChange}
+        elements={elements}
+        error={error}
+      />
 
-      {/* Delete Confirmation Modal */}
-      <Modal
+      <DeleteCardModal
         isOpen={showDeleteModal}
         onClose={() => {
           setShowDeleteModal(false);
           setSelectedCard(null);
         }}
-        title="Delete Card"
-        message={`Are you sure you want to delete the card "${selectedCard?.name}"?`}
-        confirmText="Delete"
         onConfirm={handleConfirmDelete}
+        cardName={selectedCard?.name}
+        isDeleting={!!deletingCard}
       />
     </div>
   );

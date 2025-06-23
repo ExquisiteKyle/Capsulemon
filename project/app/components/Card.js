@@ -2,7 +2,7 @@
 
 import styles from "./Card.module.css";
 
-export default function Card({ card, quantity = 1, showQuantity = true }) {
+const Card = ({ card, quantity = 1, showQuantity = true }) => {
   const getRarityColor = (rarity) => {
     switch (rarity.toLowerCase()) {
       case "common":
@@ -73,4 +73,6 @@ export default function Card({ card, quantity = 1, showQuantity = true }) {
       </div>
     </div>
   );
-}
+};
+
+export default Card;

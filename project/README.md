@@ -1,4 +1,4 @@
-# Project Website
+# Gachapon Project
 
 This is the user-facing website for the project. It runs on port 3002 to avoid conflicts with the admin website and server.
 

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "../../../shared/auth";
 import styles from "./page.module.css";
 
-export default function PurchasePage() {
+const PurchasePage = () => {
   const { credits, refreshCredits, api } = useAuth();
   const router = useRouter();
 
@@ -187,4 +187,6 @@ export default function PurchasePage() {
       </div>
     </div>
   );
-}
+};
+
+export default PurchasePage;

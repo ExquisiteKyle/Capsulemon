@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./styles.module.css";
-import Modal from "@/components/common/Modal";
 import { useAuth } from "@/context/AuthContext";
+import { PackCardsGrid, AddCardModal } from "@/components/pack-cards";
 import {
   fetchPackById,
   fetchPackCards,
@@ -135,6 +135,32 @@ export default function ManagePackCards({ params }) {
       });
   };
 
+  const handleEditDropRate = (cardId, currentDropRate) => {
+    setEditingCard(cardId);
+    setDropRate(currentDropRate);
+  };
+
+  const handleDropRateChange = (value) => {
+    setDropRate(value);
+  };
+
+  const handleSaveDropRate = (cardId, newDropRate) => {
+    handleUpdateDropRate(cardId, newDropRate);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCard(null);
+    setDropRate("");
+  };
+
+  const handleCardSelect = (card) => {
+    setSelectedCard(card);
+  };
+
+  const handleDropRateChangeInModal = (value) => {
+    setDropRate(value);
+  };
+
   if (authLoading || loading) {
     return <div className={styles.container}>Loading...</div>;
   }
@@ -175,154 +201,32 @@ export default function ManagePackCards({ params }) {
           </button>
         </div>
 
-        <div className={styles.packsGrid}>
-          {packCards.map((card) => (
-            <div key={card.card_id} className={styles.pack}>
-              <div className={styles.packHeader}>
-                <h2 className={styles.packName}>{card.card_name}</h2>
-                <div
-                  className={`${styles.rarity} ${
-                    styles[card.rarity.toLowerCase()]
-                  }`}
-                >
-                  {card.rarity}
-                </div>
-              </div>
-              {card.image_url && (
-                <div className={styles.imageWrapper}>
-                  <img
-                    src={card.image_url}
-                    alt={card.card_name}
-                    className={styles.cardImage}
-                  />
-                </div>
-              )}
-              <div className={styles.cardInfo}>
-                {card.element_name} | Power: {card.power}
-              </div>
-              {editingCard === card.card_id ? (
-                <div className={styles.editDropRate}>
-                  <input
-                    type="number"
-                    value={dropRate}
-                    onChange={(e) => setDropRate(e.target.value)}
-                    step="0.01"
-                    min="0"
-                    max="100"
-                    required
-                  />
-                  <div className={styles.editActions}>
-                    <button
-                      className={styles.saveButton}
-                      onClick={() =>
-                        handleUpdateDropRate(card.card_id, dropRate)
-                      }
-                    >
-                      Save
-                    </button>
-                    <button
-                      className={styles.cancelButton}
-                      onClick={() => {
-                        setEditingCard(null);
-                        setDropRate("");
-                      }}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className={styles.dropRate}>
-                  Drop Rate: {card.drop_rate}%
-                  <div className={styles.packActions}>
-                    <button
-                      className={styles.editButton}
-                      onClick={() => {
-                        setEditingCard(card.card_id);
-                        setDropRate(card.drop_rate.toString());
-                      }}
-                    >
-                      Edit Rate
-                    </button>
-                    <button
-                      className={styles.deleteButton}
-                      onClick={() => handleRemoveCard(card.card_id)}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+        <PackCardsGrid
+          packCards={packCards}
+          editingCard={editingCard}
+          dropRate={dropRate}
+          onEditDropRate={handleEditDropRate}
+          onRemoveCard={handleRemoveCard}
+          onDropRateChange={handleDropRateChange}
+          onSaveDropRate={handleSaveDropRate}
+          onCancelEdit={handleCancelEdit}
+        />
       </div>
 
-      {/* Add Card Modal */}
-      <Modal
+      <AddCardModal
         isOpen={showAddCardModal}
         onClose={() => {
           setShowAddCardModal(false);
           setSelectedCard(null);
           setDropRate("");
         }}
-        title="Add Card to Pack"
-        showActions={false}
-      >
-        <div className={styles.modalContent}>
-          <div className={styles.formGroup}>
-            <label>Card:</label>
-            <select
-              value={selectedCard?.id || ""}
-              onChange={(e) => {
-                const card = availableCards.find(
-                  (c) => c.id === parseInt(e.target.value)
-                );
-                setSelectedCard(card);
-              }}
-              required
-            >
-              <option value="">Select a card</option>
-              {availableCards.map((card) => (
-                <option key={card.id} value={card.id}>
-                  {card.name} ({card.rarity})
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className={styles.formGroup}>
-            <label>Drop Rate (%):</label>
-            <input
-              type="number"
-              value={dropRate}
-              onChange={(e) => setDropRate(e.target.value)}
-              step="0.01"
-              min="0"
-              max="100"
-              required
-            />
-          </div>
-          <div className={styles.modalActions}>
-            <button
-              className={styles.cancelButton}
-              onClick={() => {
-                setShowAddCardModal(false);
-                setSelectedCard(null);
-                setDropRate("");
-              }}
-            >
-              Cancel
-            </button>
-            <button
-              className={styles.saveButton}
-              onClick={handleAddCard}
-              disabled={!selectedCard || !dropRate}
-            >
-              Add Card
-            </button>
-          </div>
-        </div>
-      </Modal>
+        onAddCard={handleAddCard}
+        selectedCard={selectedCard}
+        onCardSelect={handleCardSelect}
+        dropRate={dropRate}
+        onDropRateChange={handleDropRateChangeInModal}
+        availableCards={availableCards}
+      />
     </div>
   );
 }

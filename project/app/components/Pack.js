@@ -2,7 +2,7 @@
 
 import styles from "./Pack.module.css";
 
-export default function Pack({ pack, onOpen, userCredits = 0 }) {
+const Pack = ({ pack, onOpen, userCredits = 0 }) => {
   const hasEnoughCredits = userCredits >= pack.cost;
 
   return (
@@ -43,4 +43,6 @@ export default function Pack({ pack, onOpen, userCredits = 0 }) {
       </div>
     </div>
   );
-}
+};
+
+export default Pack;

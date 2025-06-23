@@ -2,7 +2,7 @@
 
 import styles from "./Stats.module.css";
 
-export default function Stats({ ownedCards, totalCards }) {
+const Stats = ({ ownedCards, totalCards }) => {
   const uniqueCards = ownedCards.length;
   const totalQuantity = ownedCards.reduce(
     (sum, card) => sum + card.quantity,
@@ -78,4 +78,6 @@ export default function Stats({ ownedCards, totalCards }) {
       )}
     </div>
   );
-}
+};
+
+export default Stats;

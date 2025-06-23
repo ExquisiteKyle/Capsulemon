@@ -1,0 +1,17 @@
+.packsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.pack {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.pack:hover {
+  box-shadow: 0 7px 14px rgba(0, 0, 0, 0.07);
+} 

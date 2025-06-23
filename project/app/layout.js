@@ -3,11 +3,11 @@ import { Providers } from "./providers";
 import "./globals.css";
 
 export const metadata = {
-  title: "Project Website",
-  description: "User-facing project website",
+  title: "Gachapon Project",
+  description: "Create your empire.",
 };
 
-export default function RootLayout({ children }) {
+const RootLayout = ({ children }) => {
   return (
     <html lang="en">
       <body>
@@ -15,4 +15,6 @@ export default function RootLayout({ children }) {
       </body>
     </html>
   );
-}
+};
+
+export default RootLayout;

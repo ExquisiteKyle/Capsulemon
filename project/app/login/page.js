@@ -1,5 +1,7 @@
 import LoginPage from "../../../shared/auth/components/LoginPage";
 
-export default function Login() {
+const Login = () => {
   return <LoginPage />;
-}
+};
+
+export default Login;

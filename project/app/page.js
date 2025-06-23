@@ -4,22 +4,33 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../shared/auth";
 import { InteractivePackReveal, ConfirmModal } from "../../shared/components";
-import Card from "./components/Card";
-import Pack from "./components/Pack";
-import Stats from "./components/Stats";
+import {
+  VideoBackground,
+  Header,
+  TabNavigation,
+  ErrorDisplay,
+} from "./components/layout";
+import {
+  OverviewSection,
+  CollectionSection,
+  PacksSection,
+  LoadingSection,
+} from "./components/sections";
 import styles from "./page.module.css";
+import useUserData from "./hooks/useUserData";
 
-export default function Home() {
+const Home = () => {
   const { isLoggedIn, loading, username, logout, credits, setCredits, api } =
     useAuth();
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState("overview");
 
+  // Data state
   const [ownedCards, setOwnedCards] = useState([]);
   const [allCards, setAllCards] = useState([]);
   const [packs, setPacks] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState("overview");
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -158,191 +169,76 @@ export default function Home() {
     }
   };
 
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+  };
+
+  const onSwitchToPacks = () => {
+    setActiveTab("packs");
+  };
+
   if (loading) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.loadingContainer}>
-          <p>Loading...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSection />;
   }
 
   if (!isLoggedIn) {
     return null; // Will redirect to login
   }
 
-  if (dataLoading) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Welcome, {username}!</h1>
-          <div className={styles.headerActions}>
-            <span className={styles.credits}>Credits: {credits}</span>
-            <button onClick={handleLogout} className={styles.logoutButton}>
-              Logout
-            </button>
-          </div>
-        </div>
-        <div className={styles.loadingContainer}>
-          <p>Loading your collection...</p>
-        </div>
-      </div>
-    );
-  }
+  const renderActiveSection = () => {
+    if (dataLoading) {
+      return <LoadingSection message="Loading your collection..." />;
+    }
+
+    switch (activeTab) {
+      case "overview":
+        return (
+          <OverviewSection
+            ownedCards={ownedCards}
+            totalCards={allCards.length}
+          />
+        );
+      case "collection":
+        return (
+          <CollectionSection
+            ownedCards={ownedCards}
+            onSwitchToPacks={onSwitchToPacks}
+          />
+        );
+      case "packs":
+        return (
+          <PacksSection
+            packs={packs}
+            onPackOpen={handlePackOpen}
+            userCredits={credits}
+          />
+        );
+      default:
+        return <LoadingSection message="Loading..." />;
+    }
+  };
 
   return (
     <>
-      <video
-        key="background-video"
-        className={styles.videoBackground}
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="auto"
-        onError={(e) => console.error("Video error:", e)}
-        onLoadStart={() => console.log("Video loading started")}
-        onCanPlay={() => console.log("Video can play")}
-        onPlay={() => console.log("Video started playing")}
-      >
-        <source src="/videos/bg_vid.mp4" type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
-
-      <div className={styles.videoOverlay}></div>
+      <VideoBackground />
 
       <div className={styles.container}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Welcome, {username}!</h1>
-          <div className={styles.headerActions}>
-            <span className={styles.credits}>Credits: {credits}</span>
-            <button
-              onClick={() => router.push("/purchase")}
-              className={styles.purchaseButton}
-            >
-              Purchase Credits
-            </button>
-            <button onClick={handleLogout} className={styles.logoutButton}>
-              Logout
-            </button>
-          </div>
-        </div>
+        <Header
+          username={username}
+          credits={credits}
+          onLogout={handleLogout}
+          onPurchase={() => router.push("/purchase")}
+        />
 
-        {error && (
-          <div className={styles.errorContainer}>
-            <p>Error: {error}</p>
-            <button onClick={fetchUserData} className={styles.retryButton}>
-              Retry
-            </button>
-          </div>
-        )}
+        {error && <ErrorDisplay error={error} onRetry={fetchUserData} />}
 
-        <div className={styles.tabContainer}>
-          <button
-            className={`${styles.tabButton} ${
-              activeTab === "overview" ? styles.activeTab : ""
-            }`}
-            onClick={() => setActiveTab("overview")}
-          >
-            Overview
-          </button>
-          <button
-            className={`${styles.tabButton} ${
-              activeTab === "collection" ? styles.activeTab : ""
-            }`}
-            onClick={() => setActiveTab("collection")}
-          >
-            Collection ({ownedCards.length})
-          </button>
-          <button
-            className={`${styles.tabButton} ${
-              activeTab === "packs" ? styles.activeTab : ""
-            }`}
-            onClick={() => setActiveTab("packs")}
-          >
-            Packs ({packs.length})
-          </button>
-        </div>
+        <TabNavigation
+          ownedCardsCount={ownedCards.length}
+          packsCount={packs.length}
+          onTabChange={handleTabChange}
+        />
 
-        <div className={styles.content}>
-          {activeTab === "overview" && (
-            <div className={styles.overviewContainer}>
-              <Stats ownedCards={ownedCards} totalCards={allCards.length} />
-
-              <div className={styles.recentCards}>
-                <h2>Recent Cards</h2>
-                {ownedCards.length > 0 ? (
-                  <div className={styles.cardsGrid}>
-                    {ownedCards.slice(0, 6).map((card, index) => (
-                      <Card
-                        key={`recent-${card.id}-${index}`}
-                        card={card}
-                        quantity={card.quantity}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <p className={styles.emptyMessage}>
-                    You don't have any cards yet. Open some packs to get
-                    started!
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
-
-          {activeTab === "collection" && (
-            <div className={styles.collectionContainer}>
-              <h2>Your Card Collection</h2>
-              {ownedCards.length > 0 ? (
-                <div className={styles.cardsGrid}>
-                  {ownedCards.map((card, index) => (
-                    <Card
-                      key={`collection-${card.id}-${index}`}
-                      card={card}
-                      quantity={card.quantity}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className={styles.emptyContainer}>
-                  <p className={styles.emptyMessage}>
-                    Your collection is empty. Open some packs to get cards!
-                  </p>
-                  <button
-                    className={styles.openPacksButton}
-                    onClick={() => setActiveTab("packs")}
-                  >
-                    Browse Packs
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {activeTab === "packs" && (
-            <div className={styles.packsContainer}>
-              <h2>Available Packs</h2>
-              {packs.length > 0 ? (
-                <div className={styles.packsGrid}>
-                  {packs.map((pack) => (
-                    <Pack
-                      key={pack.id}
-                      pack={pack}
-                      onOpen={handlePackOpen}
-                      userCredits={credits}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <p className={styles.emptyMessage}>
-                  No packs are currently available.
-                </p>
-              )}
-            </div>
-          )}
-        </div>
+        <div className={styles.content}>{renderActiveSection()}</div>
 
         {/* Interactive Pack Reveal Modal */}
         {isModalOpen && packResult && (
@@ -395,4 +291,6 @@ export default function Home() {
       </div>
     </>
   );
-}
+};
+
+export default Home;

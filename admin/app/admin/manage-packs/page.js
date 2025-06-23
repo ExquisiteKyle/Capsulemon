@@ -4,9 +4,12 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./styles.module.css";
 import { useAuth } from "@/context/AuthContext";
-import PackCard from "@/components/packs/PackCard";
-import CreatePackModal from "@/components/packs/CreatePackModal";
-import DeletePackModal from "@/components/packs/DeletePackModal";
+import {
+  CreatePackModal,
+  DeletePackModal,
+  ManagePacksHeader,
+  PacksGrid,
+} from "@/components/packs";
 import { fetchPacks, createPack, updatePack, deletePack } from "@/utils/api";
 
 export default function ManagePacks() {
@@ -22,33 +25,29 @@ export default function ManagePacks() {
   const router = useRouter();
   const { isLoggedIn, isAdmin, loading: authLoading } = useAuth();
 
-  // Redirect if not admin
+  // Fetch packs data
   useEffect(() => {
     if (!authLoading && (!isLoggedIn || !isAdmin)) {
       router.push("/");
+      return;
     }
-  }, [authLoading, isLoggedIn, isAdmin, router]);
-
-  // Fetch packs data
-  useEffect(() => {
-    const loadData = () => {
-      fetchPacks()
-        .then((response) => {
-          if (!response.ok) throw new Error("Failed to fetch packs");
-          return response.json();
-        })
-        .then((data) => setPacks(data))
-        .catch((err) => {
-          console.error("Error fetching packs:", err);
-          setError(err.message);
-        })
-        .finally(() => setLoading(false));
-    };
-
     if (isLoggedIn && isAdmin) {
+      const loadData = () => {
+        fetchPacks()
+          .then((response) => {
+            if (!response.ok) throw new Error("Failed to fetch packs");
+            return response.json();
+          })
+          .then((data) => setPacks(data))
+          .catch((err) => {
+            console.error("Error fetching packs:", err);
+            setError(err.message);
+          })
+          .finally(() => setLoading(false));
+      };
       loadData();
     }
-  }, [isLoggedIn, isAdmin]);
+  }, [isLoggedIn, isAdmin, authLoading, router]);
 
   const handleCreatePack = () => {
     createPack(newPackData)
@@ -82,12 +81,13 @@ export default function ManagePacks() {
 
   const handleEditSubmit = (e) => {
     e.preventDefault();
+    if (!editingPack) return;
     updatePack(editingPack.id, editFormData)
       .then((response) => {
         if (!response.ok) throw new Error("Failed to update pack");
         return response.json();
       })
-      .then((data) => {
+      .then(() => {
         setPacks(
           packs.map((pack) =>
             pack.id === editingPack.id ? { ...pack, ...editFormData } : pack
@@ -105,15 +105,9 @@ export default function ManagePacks() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (editingPack) {
-      setEditFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+      setEditFormData((prev) => ({ ...prev, [name]: value }));
     } else {
-      setNewPackData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+      setNewPackData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -159,37 +153,20 @@ export default function ManagePacks() {
   }
 
   return (
-    <div
-      className={`${styles.container} ${isLoggedIn ? styles.withNavbar : ""}`}
-    >
+    <div className={`${styles.container} ${styles.withNavbar}`}>
       <div className={styles.content}>
-        <h1 className={styles.title}>Manage Card Packs</h1>
-        <div className={styles.actions}>
-          <button
-            className={styles.createButton}
-            onClick={() => setShowCreateModal(true)}
-          >
-            Create New Pack
-          </button>
-        </div>
-
-        <div className={styles.packsGrid}>
-          {packs.map((pack) => (
-            <div key={pack.id} className={styles.pack}>
-              <PackCard
-                pack={pack}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                onManageCards={handleManageCards}
-                onSave={handleEditSubmit}
-                onCancel={handleCancelEdit}
-                isEditing={editingPack?.id === pack.id}
-                editFormData={editFormData}
-                onInputChange={handleInputChange}
-              />
-            </div>
-          ))}
-        </div>
+        <ManagePacksHeader onCreatePack={() => setShowCreateModal(true)} />
+        <PacksGrid
+          packs={packs}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onManageCards={handleManageCards}
+          onSave={handleEditSubmit}
+          onCancel={handleCancelEdit}
+          isEditing={editingPack}
+          editFormData={editFormData}
+          onInputChange={handleInputChange}
+        />
       </div>
 
       <CreatePackModal

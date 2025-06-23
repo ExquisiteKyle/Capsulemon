@@ -1,5 +1,7 @@
 import RegisterPage from "../../../shared/auth/components/RegisterPage";
 
-export default function Register() {
+const Register = () => {
   return <RegisterPage />;
-}
+};
+
+export default Register;
