@@ -1,7 +1,6 @@
 import express from "express";
 import {
   createCard,
-  getCards,
   getAllCards,
   updateCard,
   deleteCard,
@@ -53,9 +52,25 @@ export default (db, { authenticateUser, requireAdmin }) => {
   router.post("/", requireAdmin, async (req, res) => {
     try {
       const result = await createCard(db, req.body);
+
+      // Fetch the complete card data with element name
+      const cardData = await new Promise((resolve, reject) => {
+        db.get(
+          `SELECT c.id, c.name, c.rarity, c.power, c.image_url, e.name as element_name, c.element_id
+           FROM cards c 
+           JOIN elements e ON c.element_id = e.id
+           WHERE c.id = ?`,
+          [result.id],
+          (err, card) => {
+            if (err) reject(err);
+            else resolve(card);
+          }
+        );
+      });
+
       res.status(201).json({
         message: "Card created successfully",
-        id: result.id,
+        card: cardData,
       });
     } catch (error) {
       if (error.message === "Missing required card fields") {

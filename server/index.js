@@ -5,7 +5,7 @@ import sqlite3 from "sqlite3";
 import cors from "cors";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
-import { initializeDatabase } from "./dbInitializer.js"; // Added .js extension
+import { initializeDatabase } from "./database/initializer.js";
 import {
   generateCsrfToken,
   csrfMiddleware,

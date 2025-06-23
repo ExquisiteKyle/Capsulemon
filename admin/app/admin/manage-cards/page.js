@@ -173,11 +173,8 @@ export default function ManageCards() {
       }
 
       const newCard = await response.json();
-      // Add the new card to the list with element name
-      const elementName = elements.find(
-        (e) => e.id === parseInt(createFormData.element_id)
-      )?.name;
-      setCards([{ ...newCard.card, element_name: elementName }, ...cards]);
+      // Add the new card to the list - the server now returns complete card data
+      setCards([newCard.card, ...cards]);
 
       // Reset form and close modal
       setCreateFormData({

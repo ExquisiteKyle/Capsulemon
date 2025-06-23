@@ -1,10 +1,9 @@
 import express from "express";
 import { getAllElements } from "../services/elementService.js";
-import { createCard, getCards } from "../services/cardService.js";
-import createAuthRoutes from "./auth.js";
-import createCardRoutes from "./cards.js";
-import createPackRoutes from "./packs.js";
-import createCreditRoutes from "./credits.js";
+import authRoutes from "./auth.js";
+import cardRoutes from "./cards.js";
+import packRoutes from "./packs/index.js";
+import creditRoutes from "./credits.js";
 
 export default (
   db,
@@ -19,7 +18,7 @@ export default (
   const router = express.Router();
 
   // Mount auth routes (public routes)
-  router.use("/auth", createAuthRoutes(db, { generateCsrfToken }));
+  router.use("/auth", authRoutes(db, { generateCsrfToken }));
 
   // Authentication check middleware for all routes below
   router.use(authenticateUser);
@@ -74,7 +73,7 @@ export default (
   // Mount credit routes
   router.use(
     "/credits",
-    createCreditRoutes(db, {
+    creditRoutes(db, {
       authenticateUser,
     })
   );
@@ -82,7 +81,7 @@ export default (
   // Mount card routes (includes both card management and ownership)
   router.use(
     "/cards",
-    createCardRoutes(db, {
+    cardRoutes(db, {
       authenticateUser,
       requireAdmin,
       generateCsrfToken,
@@ -94,12 +93,9 @@ export default (
   // Mount pack routes
   router.use(
     "/packs",
-    createPackRoutes(db, {
+    packRoutes(db, {
       authenticateUser,
       requireAdmin,
-      generateCsrfToken,
-      csrfMiddleware,
-      validateExistingToken,
     })
   );
 

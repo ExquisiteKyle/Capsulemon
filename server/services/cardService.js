@@ -72,46 +72,6 @@ export const getAllCards = (db) =>
     );
   });
 
-// Function to get cards owned by a specific user
-export const getCards = (db, userId) =>
-  new Promise((resolve, reject) => {
-    db.all(
-      `SELECT c.*, e.name as element_name 
-       FROM cards c 
-       JOIN elements e ON c.element_id = e.id
-       JOIN cards uc ON c.id = uc.id
-       WHERE uc.id = ?`,
-      [userId],
-      (err, cards) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-        resolve(cards);
-      }
-    );
-  });
-
-// Function to get cards owned by a specific user
-export const getOwnCards = (db, userId) =>
-  new Promise((resolve, reject) => {
-    db.all(
-      `SELECT c.*, e.name as element_name 
-       FROM cards c 
-       JOIN elements e ON c.element_id = e.id
-       JOIN cards uc ON c.id = uc.id
-       WHERE uc.id = ?`,
-      [userId],
-      (err, cards) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-        resolve(cards);
-      }
-    );
-  });
-
 // Function to delete a card
 export const deleteCard = (db, cardId) => {
   return new Promise((resolve, reject) => {

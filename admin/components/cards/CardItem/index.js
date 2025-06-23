@@ -29,7 +29,7 @@ export default function CardItem({
     onSave(e);
   };
 
-  if (isEditing) {
+  if (isEditing && editFormData) {
     return (
       <div className={styles.card}>
         <form onSubmit={handleSubmit} className={styles.editForm}>
@@ -38,7 +38,7 @@ export default function CardItem({
             <input
               type="text"
               name="name"
-              value={editFormData.name}
+              value={editFormData.name || ""}
               onChange={onInputChange}
               required
             />
@@ -47,7 +47,7 @@ export default function CardItem({
             <label>Rarity:</label>
             <select
               name="rarity"
-              value={editFormData.rarity}
+              value={editFormData.rarity || ""}
               onChange={onInputChange}
               required
             >
@@ -61,7 +61,7 @@ export default function CardItem({
             <label>Element:</label>
             <select
               name="element_id"
-              value={editFormData.element_id}
+              value={editFormData.element_id || ""}
               onChange={onInputChange}
               required
             >
@@ -78,7 +78,7 @@ export default function CardItem({
             <input
               type="number"
               name="power"
-              value={editFormData.power}
+              value={editFormData.power || ""}
               onChange={onInputChange}
               required
               min="0"
@@ -89,7 +89,7 @@ export default function CardItem({
             <input
               type="url"
               name="image_url"
-              value={editFormData.image_url}
+              value={editFormData.image_url || ""}
               onChange={onInputChange}
             />
           </div>

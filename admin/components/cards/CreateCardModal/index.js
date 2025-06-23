@@ -18,7 +18,12 @@ export default function CreateCardModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Create New Card">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Create New Card"
+      showActions={false}
+    >
       <form onSubmit={handleSubmit} className={styles.createForm}>
         <div className={styles.formGroup}>
           <label>Name:</label>
