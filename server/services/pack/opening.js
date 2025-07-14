@@ -80,7 +80,6 @@ const drawCardsFromPack = (packCards) => {
 const assignCardsToUser = (db, userId, cards) =>
   new Promise((resolve, reject) => {
     const assignedCards = [];
-    let completed = 0;
 
     if (cards.length === 0) {
       return resolve(assignedCards);
@@ -90,7 +89,17 @@ const assignCardsToUser = (db, userId, cards) =>
     db.serialize(() => {
       db.run("BEGIN TRANSACTION");
 
-      cards.forEach((card) => {
+      // Process cards sequentially to avoid race conditions
+      const processCard = (index) => {
+        if (index >= cards.length) {
+          // All cards processed, commit transaction
+          db.run("COMMIT");
+          resolve(assignedCards);
+          return;
+        }
+
+        const card = cards[index];
+
         // Check if user already has this card
         db.get(
           "SELECT id, quantity FROM owned_cards WHERE user_id = ? AND card_id = ?",
@@ -120,11 +129,8 @@ const assignCardsToUser = (db, userId, cards) =>
                     isNew: false,
                   });
 
-                  completed++;
-                  if (completed === cards.length) {
-                    db.run("COMMIT");
-                    resolve(assignedCards);
-                  }
+                  // Process next card
+                  processCard(index + 1);
                 }
               );
             } else {
@@ -145,16 +151,16 @@ const assignCardsToUser = (db, userId, cards) =>
                     isNew: true,
                   });
 
-                  completed++;
-                  if (completed === cards.length) {
-                    db.run("COMMIT");
-                    resolve(assignedCards);
-                  }
+                  // Process next card
+                  processCard(index + 1);
                 }
               );
             }
           }
         );
-      });
+      };
+
+      // Start processing from the first card
+      processCard(0);
     });
   });

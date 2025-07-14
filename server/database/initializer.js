@@ -7,14 +7,17 @@ import {
   createDefaultPackCombinations,
 } from "./seedData.js";
 
-const dropTables = (db) =>
-  Promise.resolve()
-    .then(() => db.run("DROP TABLE IF EXISTS pack_combination"))
-    .then(() => db.run("DROP TABLE IF EXISTS owned_cards"))
-    .then(() => db.run("DROP TABLE IF EXISTS cards"))
-    .then(() => db.run("DROP TABLE IF EXISTS elements"))
-    .then(() => db.run("DROP TABLE IF EXISTS packs"))
-    .then(() => db.run("DROP TABLE IF EXISTS users"));
+// Helper function to check if database is empty
+const isDatabaseEmpty = (db) =>
+  new Promise((resolve, reject) => {
+    db.get("SELECT COUNT(*) as count FROM users", (err, result) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(result.count === 0);
+    });
+  });
 
 export const initializeDatabase = (db) => {
   if (!db) {
@@ -24,13 +27,23 @@ export const initializeDatabase = (db) => {
 
   return new Promise((resolve, reject) => {
     db.serialize(() => {
-      dropTables(db)
-        .then(() => createTables(db))
-        .then(() => createDefaultElements(db))
-        .then(() => createDefaultUsers(db))
-        .then(() => createDefaultCards(db))
-        .then(() => createDefaultPacks(db))
-        .then(() => createDefaultPackCombinations(db))
+      // First, ensure all tables exist
+      createTables(db)
+        .then(() => isDatabaseEmpty(db))
+        .then((isEmpty) => {
+          if (isEmpty) {
+            console.log("Database is empty, seeding with default data...");
+            // Only seed data if database is empty
+            return createDefaultElements(db)
+              .then(() => createDefaultUsers(db))
+              .then(() => createDefaultCards(db))
+              .then(() => createDefaultPacks(db))
+              .then(() => createDefaultPackCombinations(db));
+          } else {
+            console.log("Database already contains data, skipping seeding...");
+            return Promise.resolve();
+          }
+        })
         .then(resolve)
         .catch((err) => {
           console.error("Error initializing database:", err);

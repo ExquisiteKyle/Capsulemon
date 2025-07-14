@@ -43,7 +43,7 @@ export const createTables = (db) =>
       runQuery(
         db,
         `
-      CREATE TABLE users (
+      CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL,
@@ -57,7 +57,7 @@ export const createTables = (db) =>
       runQuery(
         db,
         `
-      CREATE TABLE elements (
+      CREATE TABLE IF NOT EXISTS elements (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE NOT NULL
       )
@@ -68,7 +68,7 @@ export const createTables = (db) =>
       runQuery(
         db,
         `
-      CREATE TABLE cards (
+      CREATE TABLE IF NOT EXISTS cards (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         rarity TEXT NOT NULL,
@@ -84,7 +84,7 @@ export const createTables = (db) =>
       runQuery(
         db,
         `
-      CREATE TABLE owned_cards (
+      CREATE TABLE IF NOT EXISTS owned_cards (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
         card_id INTEGER NOT NULL,
@@ -101,7 +101,7 @@ export const createTables = (db) =>
       runQuery(
         db,
         `
-      CREATE TABLE packs (
+      CREATE TABLE IF NOT EXISTS packs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE NOT NULL,
         cost INTEGER NOT NULL,
@@ -114,7 +114,7 @@ export const createTables = (db) =>
       runQuery(
         db,
         `
-      CREATE TABLE pack_combination (
+      CREATE TABLE IF NOT EXISTS pack_combination (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         pack_id INTEGER NOT NULL,
         card_id INTEGER NOT NULL,
