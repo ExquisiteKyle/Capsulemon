@@ -1,5 +1,12 @@
 import dotenv from "dotenv";
-dotenv.config({ path: "./.env.local" });
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const rootDir = join(__dirname, "..");
+
+dotenv.config({ path: join(rootDir, ".env.local") });
 import express from "express";
 import sqlite3 from "sqlite3";
 import cors from "cors";
@@ -31,7 +38,7 @@ const setupDatabase = () =>
 const startServer = async () => {
   try {
     const db = await setupDatabase();
-    // await initializeDatabase(db);
+    await initializeDatabase(db);
 
     const app = express();
     const port = process.env.PORT || 3001;

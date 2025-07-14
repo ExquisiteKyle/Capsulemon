@@ -1,5 +1,5 @@
 {
-  "name": "card-game-server",
+  "name": "server",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -21,4 +21,4 @@
   "devDependencies": {
     "nodemon": "^3.0.0"
   }
-} 
+}

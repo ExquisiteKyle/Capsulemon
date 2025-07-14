@@ -38,10 +38,11 @@ const runQuery = (db, query) =>
   });
 
 export const createTables = (db) =>
-  Promise.all([
-    runQuery(
-      db,
-      `
+  Promise.resolve()
+    .then(() =>
+      runQuery(
+        db,
+        `
       CREATE TABLE users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE NOT NULL,
@@ -50,19 +51,23 @@ export const createTables = (db) =>
         credits INTEGER DEFAULT 0
       )
     `
-    ),
-    runQuery(
-      db,
-      `
+      )
+    )
+    .then(() =>
+      runQuery(
+        db,
+        `
       CREATE TABLE elements (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE NOT NULL
       )
     `
-    ),
-    runQuery(
-      db,
-      `
+      )
+    )
+    .then(() =>
+      runQuery(
+        db,
+        `
       CREATE TABLE cards (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -73,10 +78,12 @@ export const createTables = (db) =>
         FOREIGN KEY (element_id) REFERENCES elements(id)
       )
     `
-    ),
-    runQuery(
-      db,
-      `
+      )
+    )
+    .then(() =>
+      runQuery(
+        db,
+        `
       CREATE TABLE owned_cards (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
@@ -88,10 +95,12 @@ export const createTables = (db) =>
         UNIQUE(user_id, card_id)
       )
     `
-    ),
-    runQuery(
-      db,
-      `
+      )
+    )
+    .then(() =>
+      runQuery(
+        db,
+        `
       CREATE TABLE packs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE NOT NULL,
@@ -99,10 +108,12 @@ export const createTables = (db) =>
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `
-    ),
-    runQuery(
-      db,
-      `
+      )
+    )
+    .then(() =>
+      runQuery(
+        db,
+        `
       CREATE TABLE pack_combination (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         pack_id INTEGER NOT NULL,
@@ -113,7 +124,7 @@ export const createTables = (db) =>
         UNIQUE(pack_id, card_id)
       )
     `
-    ),
-  ]);
+      )
+    );
 
 export { createUser, runQuery };

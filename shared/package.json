@@ -9,11 +9,11 @@
     "./components": "./components/index.js"
   },
   "dependencies": {
-    "react": "^18.0.0",
-    "next": "^14.0.0"
+    "next": "^14.0.0",
+    "react": "^18.0.0"
   },
   "peerDependencies": {
-    "react": "^18.0.0",
-    "next": "^14.0.0"
+    "next": "^14.0.0",
+    "react": "^18.0.0"
   }
-} 
+}
