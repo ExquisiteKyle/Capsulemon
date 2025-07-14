@@ -3,27 +3,42 @@ node_modules/
 **/node_modules/
 admin/node_modules/
 server/node_modules/
-project/node_modules/
+users/node_modules/
+shared/node_modules/
 /.pnp
 .pnp.js
+
+# Package manager files
+# Note: yarn.lock should be committed for reproducible builds
 package-lock.json
 **/package-lock.json
-yarn.lock
-**/yarn.lock
+# Keep yarn.lock - it should be committed
+# yarn.lock
+# **/yarn.lock
+
+# Yarn PnP (Plug'n'Play) - these should be committed
+# .pnp.cjs
+# .pnp.loader.mjs
+# .yarn/
 
 # Testing
 /coverage
+**/coverage
 .nyc_output
 junit.xml
 
 # Next.js
 .next/
+**/.next/
 /out/
+**/out/
 .next-env.local
 
 # Production
 /build
+**/build
 /dist
+**/dist
 *.tsbuildinfo
 
 # Environment Variables
@@ -54,11 +69,17 @@ server/.env.development
 server/.env.production
 server/.env.test
 
-project/.env
-project/.env.local
-project/.env.development
-project/.env.production
-project/.env.test
+users/.env
+users/.env.local
+users/.env.development
+users/.env.production
+users/.env.test
+
+shared/.env
+shared/.env.local
+shared/.env.development
+shared/.env.production
+shared/.env.test
 
 # Debug
 npm-debug.log*
@@ -105,13 +126,19 @@ log/
 
 # Cache and temporary files
 .cache/
+**/.cache/
 .temp/
+**/.temp/
 .tmp/
+**/.tmp/
 *.tmp
 *.temp
 .eslintcache
+**/.eslintcache
 .stylelintcache
+**/.stylelintcache
 .prettiercache
+**/.prettiercache
 
 # Build output
 *.min.js
@@ -127,3 +154,18 @@ uploads/
 dist/
 coverage/
 .vercel
+
+# Yarn specific
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+# Don't ignore PnP files - they should be committed
+# .pnp.*
+
+# TypeScript
+*.tsbuildinfo
+
+# Temporary files
+.tmp/
+temp/
