@@ -74,6 +74,9 @@
   font-weight: 500;
   color: #333;
   margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Add spacing between Drop Rate text and action buttons */
 }
 
 .packActions {

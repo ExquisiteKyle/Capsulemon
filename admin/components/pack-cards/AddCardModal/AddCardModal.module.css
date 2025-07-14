@@ -10,6 +10,10 @@
   gap: 6px;
 }
 
+.formGroup:nth-child(2) {
+  margin-top: 16px; /* Add extra spacing between dropdown and Drop Rate label */
+}
+
 .formGroup label {
   font-weight: 500;
   color: #333;

@@ -128,11 +128,6 @@ export default function InteractivePackReveal({
                         <span className={styles.cardElement}>
                           {card.element_name}
                         </span>
-                        {card.quantity && card.quantity > 1 && (
-                          <span className={styles.cardQuantity}>
-                            x{card.quantity}
-                          </span>
-                        )}
                       </div>
                     </div>
                   ) : (
@@ -145,7 +140,7 @@ export default function InteractivePackReveal({
                         </div>
                         <div className={styles.cardBackText}>?</div>
                       </div>
-                      {isRevealable && (
+                      {!isRevealed && (
                         <div className={styles.tapIndicator}>
                           <span>Tap to reveal!</span>
                         </div>
@@ -170,15 +165,17 @@ export default function InteractivePackReveal({
               {revealedCards.length} / {drawnCards.length} cards revealed
             </span>
           </div>
-        </div>
 
-        {showCompleteButton && (
-          <div className={styles.footer}>
+          <div
+            className={`${styles.footer} ${
+              showCompleteButton ? styles.visible : ""
+            }`}
+          >
             <button className={styles.completeButton} onClick={handleComplete}>
               Return
             </button>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
