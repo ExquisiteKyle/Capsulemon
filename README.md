@@ -135,14 +135,14 @@ A modern, immersive card collection dashboard built with Next.js and Express.js,
 
 ```bash
 git clone <your-repo-url>
-cd project-a
+cd Capsulemon-main
 ```
 
-2. **Install dependencies**
+2. **Install dependencies (Yarn Berry/monorepo setup)**
 
 ```bash
-# Install all dependencies (workspace setup)
-npm install
+# Install all dependencies for all workspaces using Yarn Berry (PnP)
+yarn install
 ```
 
 3. **Start the development servers**
@@ -151,21 +151,21 @@ npm install
 
 ```bash
 cd server
-npm run dev
+yarn dev
 ```
 
 **Terminal 2 - User Frontend:**
 
 ```bash
-cd project
-npm run dev
+cd users
+yarn dev
 ```
 
 **Terminal 3 - Admin Frontend:**
 
 ```bash
 cd admin
-npm run dev
+yarn dev
 ```
 
 4. **Access the applications**
@@ -191,37 +191,37 @@ The database is automatically initialized with these default users:
 ## 📁 Project Structure
 
 ```
-project-a/
-├── project/                 # Next.js user frontend (port 3003)
+Capsulemon-main/
+├── users/                  # Next.js user frontend (port 3003)
 │   ├── app/                # App Router pages
 │   ├── components/         # React components
 │   ├── public/
 │   │   └── videos/         # Video backgrounds
 │   └── package.json
 ├── admin/                  # Next.js admin frontend (port 3002)
-│   ├── app/               # Admin pages
-│   ├── components/        # Admin components
-│   ├── context/          # Admin context providers
-│   ├── utils/            # Admin utilities
+│   ├── app/                # Admin pages
+│   ├── components/         # Admin components
+│   ├── context/            # Admin context providers
+│   ├── utils/              # Admin utilities
 │   └── package.json
-├── server/                # Express.js backend (port 3001)
-│   ├── routes/           # API routes
-│   │   ├── packs/        # Pack-related routes
+├── server/                 # Express.js backend (port 3001)
+│   ├── routes/             # API routes
+│   │   ├── packs/          # Pack-related routes
 │   │   └── ...
-│   ├── services/         # Business logic
-│   │   ├── pack/         # Pack-related services
+│   ├── services/           # Business logic
+│   │   ├── pack/           # Pack-related services
 │   │   └── ...
-│   ├── middleware/       # Auth & validation
-│   ├── database/         # Database initialization
-│   │   ├── schema.js     # Database schema
-│   │   ├── seedData.js   # Initial data
-│   │   └── initializer.js # Database setup
+│   ├── middleware/         # Auth & validation
+│   ├── database/           # Database initialization
+│   │   ├── schema.js       # Database schema
+│   │   ├── seedData.js     # Initial data
+│   │   └── initializer.js  # Database setup
 │   └── package.json
-├── shared/               # Shared components and utilities
-│   ├── auth/            # Authentication components
-│   ├── components/      # Modal components
+├── shared/                 # Shared components and utilities
+│   ├── auth/               # Authentication components
+│   ├── components/         # Modal components
 │   └── package.json
-├── package.json         # Workspace configuration
+├── package.json            # Workspace configuration
 └── README.md
 ```
 
@@ -301,13 +301,13 @@ project-a/
 
 ```bash
 # User frontend
-cd project
-npm run build
+cd users
+yarn build
 # Deploy to Vercel
 
 # Admin frontend
 cd admin
-npm run build
+yarn build
 # Deploy to Vercel
 ```
 
@@ -315,7 +315,7 @@ npm run build
 
 ```bash
 cd server
-npm run build
+yarn build
 # Deploy to your preferred platform
 ```
 
