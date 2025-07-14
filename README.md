@@ -104,7 +104,7 @@ A modern, immersive card collection dashboard built with Next.js and Express.js,
 
 ### Pack Opening
 
-![Pack Opening](./screenshots/card_draw.png)
+![Pack Opening](./screenshots/reveal-demo.gif)
 
 ### Admin Login
 
